@@ -6,10 +6,10 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
 
-import org.lastbamboo.shoot.protocol.CloseListener;
-import org.lastbamboo.shoot.protocol.ProtocolHandler;
-import org.lastbamboo.shoot.protocol.ReaderWriter;
-import org.lastbamboo.shoot.protocol.WriteListener;
+import org.lastbamboo.common.protocol.CloseListener;
+import org.lastbamboo.common.protocol.ProtocolHandler;
+import org.lastbamboo.common.protocol.ReaderWriter;
+import org.lastbamboo.common.protocol.WriteListener;
 
 /**
  * Stub class for testing.

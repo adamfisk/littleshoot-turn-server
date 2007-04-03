@@ -13,7 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import org.easymock.MockControl;
 import org.lastbamboo.common.nio.SelectorManager;
 import org.lastbamboo.common.nio.SelectorManagerImpl;
-import org.lastbamboo.shoot.protocol.ReaderWriter;
+import org.lastbamboo.common.protocol.ReaderWriter;
 import org.lastbamboo.shoot.turn.TurnProtocolHandler;
 import org.lastbamboo.shoot.turn.message.TurnMessage;
 import org.lastbamboo.shoot.turn.message.TurnMessageFactoryImpl;

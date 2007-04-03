@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.lastbamboo.shoot.protocol.ProtocolHandler;
+import org.lastbamboo.common.protocol.ProtocolHandler;
 import org.lastbamboo.shoot.turn.TurnProtocolHandler;
 import org.lastbamboo.shoot.turn.message.AllocateRequest;
 import org.lastbamboo.shoot.turn.message.AllocateResponse;

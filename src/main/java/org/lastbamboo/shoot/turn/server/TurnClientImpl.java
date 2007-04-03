@@ -17,9 +17,9 @@ import org.lastbamboo.common.nio.NioServer;
 import org.lastbamboo.common.nio.NioServerImpl;
 import org.lastbamboo.common.nio.ReadWriteConnectorImpl;
 import org.lastbamboo.common.nio.SelectorManager;
-import org.lastbamboo.shoot.protocol.ReadWriteConnector;
-import org.lastbamboo.shoot.protocol.ReadWriteConnectorListener;
-import org.lastbamboo.shoot.protocol.ReaderWriter;
+import org.lastbamboo.common.protocol.ReadWriteConnector;
+import org.lastbamboo.common.protocol.ReadWriteConnectorListener;
+import org.lastbamboo.common.protocol.ReaderWriter;
 import org.lastbamboo.shoot.turn.message.TurnMessageFactory;
 
 

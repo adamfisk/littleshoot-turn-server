@@ -1,6 +1,6 @@
 package org.lastbamboo.shoot.turn.server;
 
-import org.lastbamboo.shoot.protocol.ReaderWriter;
+import org.lastbamboo.common.protocol.ReaderWriter;
 
 /**
  * Interface for classes that manage allocated binding for TURN clients.  These
