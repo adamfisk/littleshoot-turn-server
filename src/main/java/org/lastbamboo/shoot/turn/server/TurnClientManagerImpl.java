@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.lastbamboo.shoot.nio.SelectorManager;
+import org.lastbamboo.common.nio.SelectorManager;
 import org.lastbamboo.shoot.protocol.CloseListener;
 import org.lastbamboo.shoot.protocol.ReaderWriter;
 import org.lastbamboo.shoot.turn.message.TurnMessageFactory;

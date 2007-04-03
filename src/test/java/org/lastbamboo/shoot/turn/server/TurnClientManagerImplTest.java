@@ -9,8 +9,8 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.lastbamboo.shoot.nio.SelectorManager;
-import org.lastbamboo.shoot.nio.SelectorManagerImpl;
+import org.lastbamboo.common.nio.SelectorManager;
+import org.lastbamboo.common.nio.SelectorManagerImpl;
 import org.lastbamboo.shoot.protocol.ReaderWriter;
 import org.lastbamboo.shoot.turn.message.TurnMessageFactory;
 import org.lastbamboo.shoot.turn.message.TurnMessageFactoryImpl;

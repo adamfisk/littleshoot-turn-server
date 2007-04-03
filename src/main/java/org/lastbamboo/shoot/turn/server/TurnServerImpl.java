@@ -4,10 +4,10 @@ import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.lastbamboo.shoot.nio.AcceptorListener;
-import org.lastbamboo.shoot.nio.NioServer;
-import org.lastbamboo.shoot.nio.NioServerImpl;
-import org.lastbamboo.shoot.nio.SelectorManager;
+import org.lastbamboo.common.nio.AcceptorListener;
+import org.lastbamboo.common.nio.NioServer;
+import org.lastbamboo.common.nio.NioServerImpl;
+import org.lastbamboo.common.nio.SelectorManager;
 import org.lastbamboo.shoot.turn.TurnConstants;
 
 /**

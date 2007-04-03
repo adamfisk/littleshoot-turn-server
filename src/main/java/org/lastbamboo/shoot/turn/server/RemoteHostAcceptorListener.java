@@ -7,9 +7,9 @@ import java.nio.channels.SocketChannel;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.lastbamboo.shoot.nio.AcceptorListener;
-import org.lastbamboo.shoot.nio.NioReaderWriter;
-import org.lastbamboo.shoot.nio.SelectorManager;
+import org.lastbamboo.common.nio.AcceptorListener;
+import org.lastbamboo.common.nio.NioReaderWriter;
+import org.lastbamboo.common.nio.SelectorManager;
 import org.lastbamboo.shoot.protocol.ProtocolHandler;
 import org.lastbamboo.shoot.protocol.ReaderWriter;
 import org.lastbamboo.shoot.turn.message.TurnMessageFactory;

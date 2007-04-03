@@ -9,8 +9,8 @@ import java.nio.ByteBuffer;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.lastbamboo.shoot.nio.NioReaderWriter;
-import org.lastbamboo.shoot.nio.SelectorManager;
+import org.lastbamboo.common.nio.NioReaderWriter;
+import org.lastbamboo.common.nio.SelectorManager;
 import org.lastbamboo.shoot.protocol.ReaderWriter;
 import org.lastbamboo.shoot.turn.message.TurnMessageFactory;
 import org.lastbamboo.shoot.turn.message.TurnMessageFactoryImpl;

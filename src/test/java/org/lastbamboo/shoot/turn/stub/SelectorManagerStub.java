@@ -3,8 +3,8 @@ package org.lastbamboo.shoot.turn.stub;
 import java.io.IOException;
 import java.nio.channels.SelectableChannel;
 
-import org.lastbamboo.shoot.nio.SelectorHandler;
-import org.lastbamboo.shoot.nio.SelectorManager;
+import org.lastbamboo.common.nio.SelectorHandler;
+import org.lastbamboo.common.nio.SelectorManager;
 
 /**
  * Stub selector for testing.
