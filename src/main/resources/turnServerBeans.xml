@@ -6,7 +6,7 @@
         The message handler factory class to use for processing TURN messages.
     -->
     <bean id="turnClientManager"
-          class="org.lastbamboo.shoot.turn.server.TurnClientManagerImpl">
+          class="org.lastbamboo.common.turn.server.TurnClientManagerImpl">
         <constructor-arg index="0">
             <ref bean="selectorManager"/>
             </constructor-arg>
@@ -17,13 +17,13 @@
             <ref bean="turnPortGenerator"/>
             </constructor-arg>
         </bean>
-        
+
     <!--
         The message handler factory class to use for processing TURN
         messages.
     -->
     <bean id="turnServerMessageHandlerFactory"
-          class="org.lastbamboo.shoot.turn.server.ServerTurnMessageHandlerFactory">
+          class="org.lastbamboo.common.turn.server.ServerTurnMessageHandlerFactory">
         <property name="turnMessageFactory">
             <ref bean="turnMessageFactory"/>
             </property>
@@ -36,7 +36,7 @@
         The object that handles listening for incoming TURN client connections.
     -->
     <bean id="turnServerAcceptorListener"
-          class="org.lastbamboo.shoot.turn.server.TurnServerAcceptorListener">
+          class="org.lastbamboo.common.turn.server.TurnServerAcceptorListener">
         <constructor-arg index="0">
             <ref bean="selectorManager"/>
             </constructor-arg>
@@ -55,7 +55,7 @@
         The TURN server facade.
     -->
     <bean id="turnServer"
-          class="org.lastbamboo.shoot.turn.server.TurnServerImpl">
+          class="org.lastbamboo.common.turn.server.TurnServerImpl">
         <constructor-arg index="0">
             <ref bean="selectorManager"/>
             </constructor-arg>
