@@ -7,16 +7,16 @@ import java.nio.ByteBuffer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lastbamboo.common.protocol.ReaderWriter;
-import org.lastbamboo.shoot.turn.message.AllocateRequest;
-import org.lastbamboo.shoot.turn.message.AllocateResponse;
-import org.lastbamboo.shoot.turn.message.DataIndication;
-import org.lastbamboo.shoot.turn.message.SendErrorResponse;
-import org.lastbamboo.shoot.turn.message.SendRequest;
-import org.lastbamboo.shoot.turn.message.SendResponse;
-import org.lastbamboo.shoot.turn.message.TurnMessage;
-import org.lastbamboo.shoot.turn.message.TurnMessageFactory;
-import org.lastbamboo.shoot.turn.message.TurnMessageVisitor;
-import org.lastbamboo.shoot.turn.message.attribute.SendErrorResponseCodeImpl;
+import org.lastbamboo.common.turn.message.AllocateRequest;
+import org.lastbamboo.common.turn.message.AllocateResponse;
+import org.lastbamboo.common.turn.message.DataIndication;
+import org.lastbamboo.common.turn.message.SendErrorResponse;
+import org.lastbamboo.common.turn.message.SendRequest;
+import org.lastbamboo.common.turn.message.SendResponse;
+import org.lastbamboo.common.turn.message.TurnMessage;
+import org.lastbamboo.common.turn.message.TurnMessageFactory;
+import org.lastbamboo.common.turn.message.TurnMessageVisitor;
+import org.lastbamboo.common.turn.message.attribute.SendErrorResponseCodeImpl;
 
 /**
  * Class that responds to TURN requests from a single TURN client.  Each TURN 

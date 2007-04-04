@@ -4,12 +4,12 @@ import java.net.InetSocketAddress;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.lastbamboo.shoot.turn.message.TurnMessageFactory;
-import org.lastbamboo.shoot.turn.message.TurnMessageTypes;
-import org.lastbamboo.shoot.turn.message.attribute.reader.TurnAttributesReader;
-import org.lastbamboo.shoot.turn.message.handler.TurnMessageHandler;
-import org.lastbamboo.shoot.turn.message.handler.TurnMessageHandlerFactory;
-import org.lastbamboo.shoot.turn.message.handler.UnknownMessageTypeHandler;
+import org.lastbamboo.common.turn.message.TurnMessageFactory;
+import org.lastbamboo.common.turn.message.TurnMessageTypes;
+import org.lastbamboo.common.turn.message.attribute.reader.TurnAttributesReader;
+import org.lastbamboo.common.turn.message.handler.TurnMessageHandler;
+import org.lastbamboo.common.turn.message.handler.TurnMessageHandlerFactory;
+import org.lastbamboo.common.turn.message.handler.UnknownMessageTypeHandler;
 
 /**
  * Implementation of a TURN requests handler factory for creating TURN

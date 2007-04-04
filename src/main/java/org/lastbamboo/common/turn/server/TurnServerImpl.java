@@ -8,7 +8,7 @@ import org.lastbamboo.common.nio.AcceptorListener;
 import org.lastbamboo.common.nio.NioServer;
 import org.lastbamboo.common.nio.NioServerImpl;
 import org.lastbamboo.common.nio.SelectorManager;
-import org.lastbamboo.shoot.turn.TurnConstants;
+import org.lastbamboo.common.turn.TurnConstants;
 
 /**
  * Creates a new TURN server.

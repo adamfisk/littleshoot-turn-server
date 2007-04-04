@@ -12,14 +12,14 @@ import org.easymock.MockControl;
 import org.lastbamboo.common.nio.NioReaderWriter;
 import org.lastbamboo.common.nio.SelectorManager;
 import org.lastbamboo.common.protocol.ReaderWriter;
+import org.lastbamboo.common.turn.message.TurnMessageFactory;
+import org.lastbamboo.common.turn.message.TurnMessageFactoryImpl;
+import org.lastbamboo.common.turn.message.attribute.TurnAttributeFactoryImpl;
 import org.lastbamboo.common.turn.server.TurnClient;
 import org.lastbamboo.common.turn.server.TurnClientImpl;
 import org.lastbamboo.common.turn.stub.ReaderWriterStub;
 import org.lastbamboo.common.turn.stub.SelectorManagerStub;
 import org.lastbamboo.common.turn.stub.SocketChannelStub;
-import org.lastbamboo.shoot.turn.message.TurnMessageFactory;
-import org.lastbamboo.shoot.turn.message.TurnMessageFactoryImpl;
-import org.lastbamboo.shoot.turn.message.attribute.TurnAttributeFactoryImpl;
 
 /**
  * Tests the class that handles services for a single TURN client.

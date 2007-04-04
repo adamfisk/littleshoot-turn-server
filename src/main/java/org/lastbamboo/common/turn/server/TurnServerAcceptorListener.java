@@ -11,10 +11,10 @@ import org.lastbamboo.common.nio.NioReaderWriter;
 import org.lastbamboo.common.nio.SelectorManager;
 import org.lastbamboo.common.protocol.ProtocolHandler;
 import org.lastbamboo.common.protocol.ReaderWriter;
-import org.lastbamboo.shoot.turn.TurnProtocolHandler;
-import org.lastbamboo.shoot.turn.message.TurnMessageFactory;
-import org.lastbamboo.shoot.turn.message.TurnMessageVisitor;
-import org.lastbamboo.shoot.turn.message.handler.TurnMessageHandlerFactory;
+import org.lastbamboo.common.turn.TurnProtocolHandler;
+import org.lastbamboo.common.turn.message.TurnMessageFactory;
+import org.lastbamboo.common.turn.message.TurnMessageVisitor;
+import org.lastbamboo.common.turn.message.handler.TurnMessageHandlerFactory;
 
 /**
  * Creates a new listener for accepted sockets to the TURN server.  These will

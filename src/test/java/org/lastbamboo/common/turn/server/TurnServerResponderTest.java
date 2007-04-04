@@ -7,14 +7,14 @@ import java.nio.ByteBuffer;
 
 import org.easymock.MockControl;
 import org.lastbamboo.common.protocol.ReaderWriter;
+import org.lastbamboo.common.turn.message.SendErrorResponse;
+import org.lastbamboo.common.turn.message.SendRequest;
+import org.lastbamboo.common.turn.message.SendResponse;
+import org.lastbamboo.common.turn.message.TurnMessageFactory;
+import org.lastbamboo.common.turn.message.attribute.SendErrorResponseCodeImpl;
 import org.lastbamboo.common.turn.server.TurnClientImpl;
 import org.lastbamboo.common.turn.server.TurnClientManagerImpl;
 import org.lastbamboo.common.turn.server.TurnServerResponder;
-import org.lastbamboo.shoot.turn.message.SendErrorResponse;
-import org.lastbamboo.shoot.turn.message.SendRequest;
-import org.lastbamboo.shoot.turn.message.SendResponse;
-import org.lastbamboo.shoot.turn.message.TurnMessageFactory;
-import org.lastbamboo.shoot.turn.message.attribute.SendErrorResponseCodeImpl;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**

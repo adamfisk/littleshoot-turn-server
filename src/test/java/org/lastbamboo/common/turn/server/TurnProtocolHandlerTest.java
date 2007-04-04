@@ -14,21 +14,21 @@ import org.easymock.MockControl;
 import org.lastbamboo.common.nio.SelectorManager;
 import org.lastbamboo.common.nio.SelectorManagerImpl;
 import org.lastbamboo.common.protocol.ReaderWriter;
+import org.lastbamboo.common.turn.TurnProtocolHandler;
+import org.lastbamboo.common.turn.message.TurnMessage;
+import org.lastbamboo.common.turn.message.TurnMessageFactoryImpl;
+import org.lastbamboo.common.turn.message.TurnMessageTypes;
+import org.lastbamboo.common.turn.message.TurnMessageVisitor;
+import org.lastbamboo.common.turn.message.attribute.TurnAttributeFactory;
+import org.lastbamboo.common.turn.message.attribute.TurnAttributeFactoryImpl;
+import org.lastbamboo.common.turn.message.attribute.handler.TurnAttributeHandlerFactoryImpl;
+import org.lastbamboo.common.turn.message.attribute.reader.TurnAttributesReaderImpl;
+import org.lastbamboo.common.turn.message.handler.TurnMessageHandlerFactory;
 import org.lastbamboo.common.turn.server.AllocateRequestHandler;
 import org.lastbamboo.common.turn.server.TurnClientManager;
 import org.lastbamboo.common.turn.server.TurnClientManagerImpl;
 import org.lastbamboo.common.turn.server.TurnServerResponder;
-import org.lastbamboo.shoot.turn.TurnProtocolHandler;
-import org.lastbamboo.shoot.turn.message.TurnMessage;
-import org.lastbamboo.shoot.turn.message.TurnMessageFactoryImpl;
-import org.lastbamboo.shoot.turn.message.TurnMessageTypes;
-import org.lastbamboo.shoot.turn.message.TurnMessageVisitor;
-import org.lastbamboo.shoot.turn.message.attribute.TurnAttributeFactory;
-import org.lastbamboo.shoot.turn.message.attribute.TurnAttributeFactoryImpl;
-import org.lastbamboo.shoot.turn.message.attribute.handler.TurnAttributeHandlerFactoryImpl;
-import org.lastbamboo.shoot.turn.message.attribute.reader.TurnAttributesReaderImpl;
-import org.lastbamboo.shoot.turn.message.handler.TurnMessageHandlerFactory;
-import org.lastbamboo.shoot.turn.util.RandomNonCollidingPortGeneratorImpl;
+import org.lastbamboo.common.turn.util.RandomNonCollidingPortGeneratorImpl;
 
 /**
  * Test for the class that processes incoiming TURN messages.

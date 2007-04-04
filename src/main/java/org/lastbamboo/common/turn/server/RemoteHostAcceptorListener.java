@@ -12,7 +12,7 @@ import org.lastbamboo.common.nio.NioReaderWriter;
 import org.lastbamboo.common.nio.SelectorManager;
 import org.lastbamboo.common.protocol.ProtocolHandler;
 import org.lastbamboo.common.protocol.ReaderWriter;
-import org.lastbamboo.shoot.turn.message.TurnMessageFactory;
+import org.lastbamboo.common.turn.message.TurnMessageFactory;
 
 /**
  * Listener for incoming connections attempting to send data to one of this

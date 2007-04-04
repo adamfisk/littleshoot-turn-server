@@ -20,7 +20,7 @@ import org.lastbamboo.common.nio.SelectorManager;
 import org.lastbamboo.common.protocol.ReadWriteConnector;
 import org.lastbamboo.common.protocol.ReadWriteConnectorListener;
 import org.lastbamboo.common.protocol.ReaderWriter;
-import org.lastbamboo.shoot.turn.message.TurnMessageFactory;
+import org.lastbamboo.common.turn.message.TurnMessageFactory;
 
 
 /**

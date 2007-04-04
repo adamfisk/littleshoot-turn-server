@@ -12,12 +12,12 @@ import junit.framework.TestCase;
 import org.lastbamboo.common.nio.SelectorManager;
 import org.lastbamboo.common.nio.SelectorManagerImpl;
 import org.lastbamboo.common.protocol.ReaderWriter;
+import org.lastbamboo.common.turn.message.TurnMessageFactory;
+import org.lastbamboo.common.turn.message.TurnMessageFactoryImpl;
 import org.lastbamboo.common.turn.server.TurnClient;
 import org.lastbamboo.common.turn.server.TurnClientManagerImpl;
 import org.lastbamboo.common.turn.stub.ReaderWriterStub;
-import org.lastbamboo.shoot.turn.message.TurnMessageFactory;
-import org.lastbamboo.shoot.turn.message.TurnMessageFactoryImpl;
-import org.lastbamboo.shoot.turn.util.RandomNonCollidingPortGeneratorImpl;
+import org.lastbamboo.common.turn.util.RandomNonCollidingPortGeneratorImpl;
 
 /**
  * Tests the class for managing TURN clients.

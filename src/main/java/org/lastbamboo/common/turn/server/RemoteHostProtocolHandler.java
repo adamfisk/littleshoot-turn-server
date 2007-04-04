@@ -7,8 +7,8 @@ import java.nio.ByteBuffer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lastbamboo.common.protocol.ProtocolHandler;
-import org.lastbamboo.shoot.turn.message.TurnMessage;
-import org.lastbamboo.shoot.turn.message.TurnMessageFactory;
+import org.lastbamboo.common.turn.message.TurnMessage;
+import org.lastbamboo.common.turn.message.TurnMessageFactory;
 
 /**
  * This "protocol" handler simply reads data from the connecting client and
