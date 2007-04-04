@@ -1,4 +1,4 @@
-package org.lastbamboo.shoot.turn.stub;
+package org.lastbamboo.common.turn.stub;
 
 import java.io.IOException;
 import java.net.Socket;

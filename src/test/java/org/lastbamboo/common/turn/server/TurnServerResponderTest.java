@@ -1,4 +1,4 @@
-package org.lastbamboo.shoot.turn.server;
+package org.lastbamboo.common.turn.server;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -7,6 +7,9 @@ import java.nio.ByteBuffer;
 
 import org.easymock.MockControl;
 import org.lastbamboo.common.protocol.ReaderWriter;
+import org.lastbamboo.common.turn.server.TurnClientImpl;
+import org.lastbamboo.common.turn.server.TurnClientManagerImpl;
+import org.lastbamboo.common.turn.server.TurnServerResponder;
 import org.lastbamboo.shoot.turn.message.SendErrorResponse;
 import org.lastbamboo.shoot.turn.message.SendRequest;
 import org.lastbamboo.shoot.turn.message.SendResponse;

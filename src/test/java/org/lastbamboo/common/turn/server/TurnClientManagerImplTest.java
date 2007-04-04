@@ -1,4 +1,4 @@
-package org.lastbamboo.shoot.turn.server;
+package org.lastbamboo.common.turn.server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -12,9 +12,11 @@ import junit.framework.TestCase;
 import org.lastbamboo.common.nio.SelectorManager;
 import org.lastbamboo.common.nio.SelectorManagerImpl;
 import org.lastbamboo.common.protocol.ReaderWriter;
+import org.lastbamboo.common.turn.server.TurnClient;
+import org.lastbamboo.common.turn.server.TurnClientManagerImpl;
+import org.lastbamboo.common.turn.stub.ReaderWriterStub;
 import org.lastbamboo.shoot.turn.message.TurnMessageFactory;
 import org.lastbamboo.shoot.turn.message.TurnMessageFactoryImpl;
-import org.lastbamboo.shoot.turn.stub.ReaderWriterStub;
 import org.lastbamboo.shoot.turn.util.RandomNonCollidingPortGeneratorImpl;
 
 /**

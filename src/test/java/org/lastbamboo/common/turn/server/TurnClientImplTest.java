@@ -1,4 +1,4 @@
-package org.lastbamboo.shoot.turn.server;
+package org.lastbamboo.common.turn.server;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -12,12 +12,14 @@ import org.easymock.MockControl;
 import org.lastbamboo.common.nio.NioReaderWriter;
 import org.lastbamboo.common.nio.SelectorManager;
 import org.lastbamboo.common.protocol.ReaderWriter;
+import org.lastbamboo.common.turn.server.TurnClient;
+import org.lastbamboo.common.turn.server.TurnClientImpl;
+import org.lastbamboo.common.turn.stub.ReaderWriterStub;
+import org.lastbamboo.common.turn.stub.SelectorManagerStub;
+import org.lastbamboo.common.turn.stub.SocketChannelStub;
 import org.lastbamboo.shoot.turn.message.TurnMessageFactory;
 import org.lastbamboo.shoot.turn.message.TurnMessageFactoryImpl;
 import org.lastbamboo.shoot.turn.message.attribute.TurnAttributeFactoryImpl;
-import org.lastbamboo.shoot.turn.stub.ReaderWriterStub;
-import org.lastbamboo.shoot.turn.stub.SelectorManagerStub;
-import org.lastbamboo.shoot.turn.stub.SocketChannelStub;
 
 /**
  * Tests the class that handles services for a single TURN client.

@@ -1,4 +1,4 @@
-package org.lastbamboo.shoot.turn.server;
+package org.lastbamboo.common.turn.server;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -14,6 +14,10 @@ import org.easymock.MockControl;
 import org.lastbamboo.common.nio.SelectorManager;
 import org.lastbamboo.common.nio.SelectorManagerImpl;
 import org.lastbamboo.common.protocol.ReaderWriter;
+import org.lastbamboo.common.turn.server.AllocateRequestHandler;
+import org.lastbamboo.common.turn.server.TurnClientManager;
+import org.lastbamboo.common.turn.server.TurnClientManagerImpl;
+import org.lastbamboo.common.turn.server.TurnServerResponder;
 import org.lastbamboo.shoot.turn.TurnProtocolHandler;
 import org.lastbamboo.shoot.turn.message.TurnMessage;
 import org.lastbamboo.shoot.turn.message.TurnMessageFactoryImpl;

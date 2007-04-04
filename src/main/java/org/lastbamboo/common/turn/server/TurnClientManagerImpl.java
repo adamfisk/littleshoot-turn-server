@@ -1,4 +1,4 @@
-package org.lastbamboo.shoot.turn.server;
+package org.lastbamboo.common.turn.server;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;

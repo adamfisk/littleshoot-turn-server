@@ -1,4 +1,4 @@
-package org.lastbamboo.shoot.turn.server;
+package org.lastbamboo.common.turn.server;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,6 +13,7 @@ import java.util.Iterator;
 import org.apache.commons.id.uuid.UUID;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.lastbamboo.common.turn.server.TurnServer;
 import org.lastbamboo.shoot.turn.TurnConstants;
 import org.lastbamboo.shoot.turn.message.AllocateRequest;
 import org.lastbamboo.shoot.turn.message.SendRequest;
