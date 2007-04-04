@@ -21,7 +21,7 @@ import org.lastbamboo.common.turn.message.TurnMessageTypes;
 import org.lastbamboo.common.turn.message.attribute.StunAttributeTypes;
 import org.lastbamboo.common.turn.message.attribute.TurnAttributeTypes;
 import org.lastbamboo.common.turn.server.TurnServer;
-import org.lastbamboo.util.Unsigned;
+import org.lastbamboo.common.util.Unsigned;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
