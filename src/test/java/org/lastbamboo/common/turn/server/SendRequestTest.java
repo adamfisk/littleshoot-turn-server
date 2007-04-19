@@ -19,6 +19,7 @@ import org.lastbamboo.common.turn.message.SendResponse;
 import org.lastbamboo.common.turn.message.TurnMessageFactory;
 import org.lastbamboo.common.turn.message.TurnMessageVisitor;
 import org.lastbamboo.common.turn.message.handler.TurnMessageHandlerFactory;
+import org.lastbamboo.common.util.NetworkUtils;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
@@ -91,7 +92,7 @@ public final class SendRequestTest
         data.rewind();
 
         final InetSocketAddress destinationAddress =
-            new InetSocketAddress(InetAddress.getLocalHost(), 43234);
+            new InetSocketAddress(NetworkUtils.getLocalHost(), 43234);
 
         final SendRequest request =
             this.m_messageFactory.createSendRequest(destinationAddress, data);
@@ -166,7 +167,7 @@ public final class SendRequestTest
 
         assertEquals(2, buffer.remaining());
         final InetSocketAddress destinationAddress =
-            new InetSocketAddress(InetAddress.getLocalHost(), 39485);
+            new InetSocketAddress(NetworkUtils.getLocalHost(), 39485);
 
         SendRequest request =
             this.m_messageFactory.createSendRequest(destinationAddress, buffer);
@@ -228,7 +229,7 @@ public final class SendRequestTest
     public void testSendRequest() throws Exception
         {
         final InetSocketAddress clientAddress =
-            new InetSocketAddress(InetAddress.getLocalHost(), 39485);
+            new InetSocketAddress(NetworkUtils.getLocalHost(), 39485);
         final byte[] testStringBytes = m_testString.getBytes();
         final ByteBuffer data = ByteBuffer.allocate(testStringBytes.length);
         data.put(testStringBytes);

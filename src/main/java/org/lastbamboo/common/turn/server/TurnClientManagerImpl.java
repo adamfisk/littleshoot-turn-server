@@ -1,6 +1,5 @@
 package org.lastbamboo.common.turn.server;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Collections;
@@ -14,6 +13,7 @@ import org.lastbamboo.common.protocol.CloseListener;
 import org.lastbamboo.common.protocol.ReaderWriter;
 import org.lastbamboo.common.turn.message.TurnMessageFactory;
 import org.lastbamboo.common.turn.util.RandomNonCollidingPortGenerator;
+import org.lastbamboo.common.util.NetworkUtils;
 
 /**
  * Manages endpoint bindings for TURN clients.  This includes allocating
@@ -61,7 +61,7 @@ public final class TurnClientManagerImpl implements TurnClientManager,
         try
             {
             final InetSocketAddress allocatedAddress = 
-                new InetSocketAddress(InetAddress.getLocalHost(), newPort);
+                new InetSocketAddress(NetworkUtils.getLocalHost(), newPort);
             
             final TurnClient turnClient = 
                 new TurnClientImpl(allocatedAddress, readerWriter, 

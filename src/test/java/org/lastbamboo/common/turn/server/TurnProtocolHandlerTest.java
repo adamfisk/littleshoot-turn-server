@@ -29,6 +29,7 @@ import org.lastbamboo.common.turn.server.TurnClientManager;
 import org.lastbamboo.common.turn.server.TurnClientManagerImpl;
 import org.lastbamboo.common.turn.server.TurnServerResponder;
 import org.lastbamboo.common.turn.util.RandomNonCollidingPortGeneratorImpl;
+import org.lastbamboo.common.util.NetworkUtils;
 
 /**
  * Test for the class that processes incoiming TURN messages.
@@ -65,7 +66,7 @@ public class TurnProtocolHandlerTest extends TestCase
             (TurnMessageHandlerFactory) control.getMock();
         
         final InetSocketAddress address = 
-            new InetSocketAddress(InetAddress.getLocalHost(), 20000);
+            new InetSocketAddress(NetworkUtils.getLocalHost(), 20000);
 
 
         

@@ -21,6 +21,7 @@ import org.lastbamboo.common.turn.message.TurnMessageTypes;
 import org.lastbamboo.common.turn.message.attribute.StunAttributeTypes;
 import org.lastbamboo.common.turn.message.attribute.TurnAttributeTypes;
 import org.lastbamboo.common.turn.server.TurnServer;
+import org.lastbamboo.common.util.NetworkUtils;
 import org.lastbamboo.common.util.Unsigned;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
@@ -73,7 +74,7 @@ public final class TurnServerTest
         server.start();
         Thread.sleep(2000);
         s_turnClientSocket =
-            new Socket(InetAddress.getLocalHost(),
+            new Socket(NetworkUtils.getLocalHost(),
                        TurnConstants.DEFAULT_SERVER_PORT);
 
         s_turnClientSocket.setSoTimeout(4000);
@@ -145,7 +146,7 @@ public final class TurnServerTest
         //assertEquals(-1, readStream.read());
 
         final InetSocketAddress localHost =
-            new InetSocketAddress(InetAddress.getLocalHost(), TEST_SERVER_PORT);
+            new InetSocketAddress(NetworkUtils.getLocalHost(), TEST_SERVER_PORT);
 
         LOG.trace("**************************Running server...");
         runThreadedTestServer();

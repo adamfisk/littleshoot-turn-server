@@ -15,6 +15,7 @@ import org.lastbamboo.common.turn.message.attribute.SendErrorResponseCodeImpl;
 import org.lastbamboo.common.turn.server.TurnClientImpl;
 import org.lastbamboo.common.turn.server.TurnClientManagerImpl;
 import org.lastbamboo.common.turn.server.TurnServerResponder;
+import org.lastbamboo.common.util.NetworkUtils;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
@@ -46,7 +47,7 @@ public final class TurnServerResponderTest
 
     public void testVisitSendRequestToDeadRemoteHost() throws Exception
         {
-        final InetAddress localHost = InetAddress.getLocalHost();
+        final InetAddress localHost = NetworkUtils.getLocalHost();
         final InetSocketAddress destinationAddress =
             new InetSocketAddress(localHost, 6879);
 
@@ -102,7 +103,7 @@ public final class TurnServerResponderTest
      */
     public void testVisitSendRequest() throws Exception
         {
-        final InetAddress localHost = InetAddress.getLocalHost();
+        final InetAddress localHost = NetworkUtils.getLocalHost();
         final InetSocketAddress socketAddress =
             new InetSocketAddress(localHost, 6879);
         final ByteBuffer data = ByteBuffer.allocate(26);

@@ -20,6 +20,7 @@ import org.lastbamboo.common.turn.server.TurnClientImpl;
 import org.lastbamboo.common.turn.stub.ReaderWriterStub;
 import org.lastbamboo.common.turn.stub.SelectorManagerStub;
 import org.lastbamboo.common.turn.stub.SocketChannelStub;
+import org.lastbamboo.common.util.NetworkUtils;
 
 /**
  * Tests the class that handles services for a single TURN client.
@@ -36,7 +37,7 @@ public final class TurnClientImplTest extends TestCase
     public void testCloseListening() throws Exception
         {
         final InetSocketAddress allocatedAddress =
-            new InetSocketAddress(InetAddress.getLocalHost(), 4859);
+            new InetSocketAddress(NetworkUtils.getLocalHost(), 4859);
        
         final ReaderWriter readerWriter = new ReaderWriterStub();
         final SelectorManager selector = new SelectorManagerStub();
@@ -46,7 +47,7 @@ public final class TurnClientImplTest extends TestCase
                 messageFactory);
         
         final InetSocketAddress remoteHostAddress = 
-            new InetSocketAddress(InetAddress.getLocalHost(), 5342);
+            new InetSocketAddress(NetworkUtils.getLocalHost(), 5342);
         final ReaderWriter remoteHostReaderWriter = 
             new NioReaderWriter(new SocketChannelStub(), selector);
         
@@ -97,9 +98,9 @@ public final class TurnClientImplTest extends TestCase
         readerWriter2Control.replay();
         
         final InetSocketAddress destinationAddress1 =
-            new InetSocketAddress(InetAddress.getLocalHost(), 7680);       
+            new InetSocketAddress(NetworkUtils.getLocalHost(), 7680);       
         final InetSocketAddress destinationAddress2 =
-            new InetSocketAddress(InetAddress.getLocalHost(), 7681);
+            new InetSocketAddress(NetworkUtils.getLocalHost(), 7681);
         
         // This just opens up permission for the clients.
         client.write(destinationAddress1, ByteBuffer.allocate(0));
@@ -122,7 +123,7 @@ public final class TurnClientImplTest extends TestCase
         messageFactory.setAttributeFactory(attributeFactory);
         
         final InetSocketAddress allocatedAddress = 
-            new InetSocketAddress(InetAddress.getLocalHost(), 11111); 
+            new InetSocketAddress(NetworkUtils.getLocalHost(), 11111); 
         
         final SelectorManager selector = new SelectorManagerStub();
         final TurnClientImpl client = new TurnClientImpl(allocatedAddress, 
@@ -143,7 +144,7 @@ public final class TurnClientImplTest extends TestCase
         {
         final TurnClient client = createTurnClient();
         final InetSocketAddress destinationAddress =
-            new InetSocketAddress(InetAddress.getLocalHost(), 7680); 
+            new InetSocketAddress(NetworkUtils.getLocalHost(), 7680); 
         
         final InetAddress address = destinationAddress.getAddress();
         assertFalse("Should not have incoming permission", 
