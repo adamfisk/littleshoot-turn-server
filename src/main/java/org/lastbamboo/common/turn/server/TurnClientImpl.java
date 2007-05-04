@@ -252,7 +252,10 @@ public final class TurnClientImpl implements TurnClient,
 
     public void close()
         {
-        LOG.warn("Closing client at: " + this.m_readerWriter);
+        if (LOG.isDebugEnabled())
+            {
+            LOG.debug("Closing client at: " + this.m_readerWriter);
+            }
         this.m_nioServer.close();
         this.m_pendingData.clear();
         this.m_permittedAddresses.clear();
