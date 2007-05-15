@@ -71,7 +71,10 @@ public final class TurnServerResponder implements TurnMessageVisitor
 
     public void visitSendRequest(final SendRequest request)
         {
-        LOG.trace("Processing send request: "+request);
+        if (LOG.isDebugEnabled())
+            {
+            LOG.debug("Processing send request: "+request);
+            }
         final InetSocketAddress destinationAddress = 
             request.getDestinationAddress();
         
@@ -124,7 +127,11 @@ public final class TurnServerResponder implements TurnMessageVisitor
 
     private void writeSuccessfulSendResponse(final TurnMessage request)
         {
-        LOG.trace("Writing successful send response to: "+this.m_readerWriter);
+        if (LOG.isDebugEnabled())
+            {
+            LOG.trace("Writing successful send response to: " + 
+                this.m_readerWriter);
+            }
         final TurnMessage response = 
             this.m_turnMessageFactory.createSendResponse(
                 request.getTransactionId());        

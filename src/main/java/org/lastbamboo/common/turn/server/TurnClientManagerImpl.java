@@ -2,9 +2,8 @@ package org.lastbamboo.common.turn.server;
 
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,8 +31,8 @@ public final class TurnClientManagerImpl implements TurnClientManager,
     /**
      * Map of <code>InetSocketAddress</code>es to TURN clients. 
      */
-    private final Map m_clientMappings = 
-        Collections.synchronizedMap(new HashMap());
+    private final Map<ReaderWriter, TurnClient> m_clientMappings = 
+        new ConcurrentHashMap<ReaderWriter, TurnClient>();
 
     private final SelectorManager m_selectorManager;
 
@@ -45,6 +44,7 @@ public final class TurnClientManagerImpl implements TurnClientManager,
      * Manager for clients this TURN server is relaying data on behalf of.
      * @param manager The manager for the NIO selector.
      * @param messageFactory The factory for creating TURN messages.
+     * @param portGenerator Class for generating ports to use for new clients.
      */
     public TurnClientManagerImpl(final SelectorManager manager, 
         final TurnMessageFactory messageFactory,
@@ -91,14 +91,13 @@ public final class TurnClientManagerImpl implements TurnClientManager,
 
     public TurnClient getTurnClient(final ReaderWriter readerWriter)
         {
-        return (TurnClient) this.m_clientMappings.get(readerWriter);
+        return this.m_clientMappings.get(readerWriter);
         }
 
     public TurnClient removeBinding(final ReaderWriter readerWriter)
         {
         LOG.trace("Removing binding for: "+readerWriter);
-        final TurnClient client = 
-            (TurnClient) this.m_clientMappings.remove(readerWriter);
+        final TurnClient client = this.m_clientMappings.remove(readerWriter);
         if (client != null)
             {
             client.close();

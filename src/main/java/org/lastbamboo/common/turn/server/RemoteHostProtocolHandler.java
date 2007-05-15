@@ -46,7 +46,10 @@ public final class RemoteHostProtocolHandler implements ProtocolHandler
     public void handleMessages(final ByteBuffer messageBuffer, 
         final InetSocketAddress remoteAddress) throws IOException
         {
-        LOG.trace("Received data from remote host: "+remoteAddress);
+        if (LOG.isDebugEnabled())
+            {
+            LOG.trace("Received data from remote host: "+remoteAddress);
+            }
         
         // TODO: How can we avoid making this copy while not writing the
         // entire TCP buffer??
@@ -70,10 +73,17 @@ public final class RemoteHostProtocolHandler implements ProtocolHandler
                 this.m_turnMessageFactory.createDataIndication(dataBuffer, 
                     remoteAddress);
             
-            LOG.trace("Wraping data in Data Indication: "+dataIndication);
+            if (LOG.isDebugEnabled())
+                {
+                LOG.trace("Wraping data in Data Indication: "+dataIndication);
+                }
             this.m_turnClient.getReaderWriter().write(
                 dataIndication.toByteBuffers());
-            LOG.trace("Wrote data indication message...");
+            
+            if (LOG.isDebugEnabled())
+                {
+                LOG.trace("Wrote data indication message...");
+                }
             }
         }
     }

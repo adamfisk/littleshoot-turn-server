@@ -37,7 +37,10 @@ public final class AllocateRequestHandler extends AbstractTurnMessageHandler
 
     public void handleMessage()
         {
-        LOG.trace("Handling request...");
+        if (LOG.isTraceEnabled())
+            {
+            LOG.trace("Handling request...");
+            }
         this.m_turnMessage = 
             this.m_turnMessageFactory.createAllocateRequest(
                 this.m_transctionId);

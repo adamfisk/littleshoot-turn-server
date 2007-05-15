@@ -33,8 +33,6 @@ public final class SendRequestHandler extends AbstractTurnMessageHandler
      * @param client The address and port of the requesting client.
      * @param turnMessageFactory The factory for creating TURN messages. 
      * @param attributesReader The reader for reading TURN attributes.
-     * @param readerWriter The reader and writer for sending and receiving data
-     * to and from the TURN client.
      */
     public SendRequestHandler(final InetSocketAddress client, 
         final TurnMessageFactory turnMessageFactory, 
@@ -59,7 +57,10 @@ public final class SendRequestHandler extends AbstractTurnMessageHandler
             (DataAttributeImpl) this.m_attributes.get(
                 new Integer(TurnAttributeTypes.DATA));
         
-        LOG.trace("Retrieved attribute: "+data);
+        if (LOG.isDebugEnabled())
+            {
+            LOG.trace("Retrieved attribute: "+data);
+            }
         if (data == null)
             {
             throw new IOException("Could not read data");
