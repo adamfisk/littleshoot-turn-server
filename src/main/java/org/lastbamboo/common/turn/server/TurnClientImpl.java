@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoSession;
 import org.lastbamboo.common.stun.stack.message.attributes.turn.ConnectionStatus;
 import org.lastbamboo.common.stun.stack.message.turn.ConnectionStatusIndication;
@@ -109,10 +110,23 @@ public final class TurnClientImpl implements TurnClient
             @Override
             public void run()
                 {
-                // Close the TURN allocation.
-                m_allocatedTurnServer.stop();
+                // We don't handle this exactly how it's specified in 
+                // draft-ietf-behave-turn-03.txt because that would
+                // require we send allocate requests from the client all
+                // the time, even when the connection has been in active
+                // use.  This way, we only close it if it's idle.
+                final long idleMilliseconds = 
+                    m_ioSession.getIdleTimeInMillis(IdleStatus.BOTH_IDLE); 
+                
+                if (idleMilliseconds > DEFAULT_LIFETIME)
+                    {
+                    // Close the TURN allocation.
+                    m_allocatedTurnServer.stop();
+                    }
                 }
             };
+        this.m_lifetimeTimer.schedule(this.m_lifetimeTimerTask, 
+            DEFAULT_LIFETIME, DEFAULT_LIFETIME);
         }
 
     public void startServer()
@@ -120,7 +134,6 @@ public final class TurnClientImpl implements TurnClient
         this.m_allocatedTurnServer = 
             new TcpAllocatedTurnServer(this, this.m_allocatedAddress.getPort());
         this.m_allocatedTurnServer.start();
-        resetLifetime();
         }
 
     public boolean write(final InetSocketAddress remoteAddress,
@@ -198,26 +211,6 @@ public final class TurnClientImpl implements TurnClient
     public IoSession getIoSession()
         {
         return this.m_ioSession;
-        }
-    
-    public void resetLifetime()
-        {
-        // If the timer hasn't run yet, then we just reset it and don't have
-        // to worry about restarting the allocated TURN server.
-        if (this.m_lifetimeTimerTask.cancel())
-            {
-            // Schedule the same task again for execution after the default
-            // lifetime.
-            this.m_lifetimeTimer.schedule(this.m_lifetimeTimerTask, 
-                DEFAULT_LIFETIME);
-            }
-        // Otherwise, tell the allocated TURN server to start again.  This 
-        // should not happen in normal operation, as clients should be 
-        // configured to send new allocate request before the server closes.
-        else
-            {
-            this.m_allocatedTurnServer.start();
-            }
         }
 
     public boolean hasActiveDestination()

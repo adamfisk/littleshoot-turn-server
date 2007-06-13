@@ -52,12 +52,16 @@ public final class TurnClientManagerImpl implements TurnClientManager
     
     public TurnClient allocateBinding(final IoSession ioSession) 
         {
+        // If we already have a client, then the allocation acts as a 
+        // keep-alive to keep the binding active.  Just the fact that there's
+        // traffice suffices to keep it alive -- we don't need to notify the
+        // client.
         if (this.m_clientMappings.containsKey(ioSession))
             {
-            final TurnClient client = this.m_clientMappings.get(ioSession);
-            client.resetLifetime();
-            return client;
+            return this.m_clientMappings.get(ioSession);
             }
+        
+        // Otherwise, we need to allocate a new server for the new client.
         else
             {
             final int newPort = this.m_portGenerator.createRandomPort();
