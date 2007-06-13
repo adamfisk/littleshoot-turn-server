@@ -3,7 +3,6 @@ package org.lastbamboo.common.turn.server;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
-import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
@@ -34,12 +33,6 @@ public final class TurnClientManagerImpl implements TurnClientManager
     private final RandomNonCollidingPortGenerator m_portGenerator;
     
     /**
-     * The {@link Timer} for TURN allocation LIFETIME expirations.  We hold
-     * one timer for all TURN clients because each timer uses a thread.
-     */
-    private final Timer m_lifetimeTimer = new Timer();
-    
-    /**
      * Manager for clients this TURN server is relaying data on behalf of.
      * 
      * @param portGenerator Class for generating ports to use for new clients.
@@ -54,7 +47,7 @@ public final class TurnClientManagerImpl implements TurnClientManager
         {
         // If we already have a client, then the allocation acts as a 
         // keep-alive to keep the binding active.  Just the fact that there's
-        // traffice suffices to keep it alive -- we don't need to notify the
+        // traffic suffices to keep it alive -- we don't need to notify the
         // client.
         if (this.m_clientMappings.containsKey(ioSession))
             {
@@ -71,8 +64,7 @@ public final class TurnClientManagerImpl implements TurnClientManager
                     new InetSocketAddress(NetworkUtils.getLocalHost(), newPort);
                 
                 final TurnClient turnClient = 
-                    new TurnClientImpl(allocatedAddress, ioSession, 
-                        this.m_lifetimeTimer);
+                    new TurnClientImpl(allocatedAddress, ioSession);
                 turnClient.startServer();
                 this.m_clientMappings.put(ioSession, turnClient);
                 

@@ -8,13 +8,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoSession;
 import org.lastbamboo.common.stun.stack.message.attributes.turn.ConnectionStatus;
 import org.lastbamboo.common.stun.stack.message.turn.ConnectionStatusIndication;
@@ -35,8 +32,11 @@ import org.slf4j.LoggerFactory;
  * throw an <code>IOException</code>, allowing the caller to respond with
  * "Send Error Response" messages to the TURN client as appropriate.
  *
- * TODO: Only allow permissions for a fixed LIFETIME (I think that's the
- * TURN attribute).
+ * Note that the lifetime of TURN allocations is handled externally 
+ * according to how it's been since we've received data from TURN clients.
+ * We deviate from the TURN spec here because it just seems to make sense
+ * to only close TURN sessions when there's been no data, not after fixed
+ * periods regardless of whether there's data or not.
  */
 public final class TurnClientImpl implements TurnClient
     {
@@ -77,17 +77,6 @@ public final class TurnClientImpl implements TurnClient
 
     private TcpAllocatedTurnServer m_allocatedTurnServer;
 
-    private final Timer m_lifetimeTimer;
-
-    private final TimerTask m_lifetimeTimerTask;
-
-    /**
-     * The default LIFETIME for allocated TURN servers.  Servers are 
-     * automatically closed if they are not refreshed with subsequent
-     * Allocate Requests before the defaul time.
-     */
-    private static final int DEFAULT_LIFETIME = 1000*60*10;
-
     /**
      * Creates a new TURN client abstraction for the specified TURN client
      * address and port.
@@ -96,37 +85,12 @@ public final class TurnClientImpl implements TurnClient
      * will report as its own address and port when communicating with other
      * clients.
      * @param ioSession The handler for writing data back to the TURN client.
-     * @param lifetimeTimer The timer for the lifetime to wait before 
-     * expiring TURN allocations.
      */
     public TurnClientImpl(final InetSocketAddress allocatedAddress,
-        final IoSession ioSession, final Timer lifetimeTimer)
+        final IoSession ioSession)
         {
         this.m_allocatedAddress = allocatedAddress;
         this.m_ioSession = ioSession;
-        this.m_lifetimeTimer = lifetimeTimer;
-        this.m_lifetimeTimerTask = new TimerTask()
-            {
-            @Override
-            public void run()
-                {
-                // We don't handle this exactly how it's specified in 
-                // draft-ietf-behave-turn-03.txt because that would
-                // require we send allocate requests from the client all
-                // the time, even when the connection has been in active
-                // use.  This way, we only close it if it's idle.
-                final long idleMilliseconds = 
-                    m_ioSession.getIdleTimeInMillis(IdleStatus.BOTH_IDLE); 
-                
-                if (idleMilliseconds > DEFAULT_LIFETIME)
-                    {
-                    // Close the TURN allocation.
-                    m_allocatedTurnServer.stop();
-                    }
-                }
-            };
-        this.m_lifetimeTimer.schedule(this.m_lifetimeTimerTask, 
-            DEFAULT_LIFETIME, DEFAULT_LIFETIME);
         }
 
     public void startServer()

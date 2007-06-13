@@ -50,7 +50,9 @@ public final class TurnServerMessageVisitor implements StunMessageVisitor
         {
         LOG.debug("Processing allocate request...");
         
-        // TODO: Use the decorator pattern here to first validate the request...
+        // Note that the client here will frequently have already existed,
+        // with the new allocate request simply serving to keep the binding
+        // alive.
         final TurnClient client = this.m_turnClientManager.allocateBinding(
             this.m_ioSession);
         
