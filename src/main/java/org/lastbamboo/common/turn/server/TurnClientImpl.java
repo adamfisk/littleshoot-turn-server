@@ -16,6 +16,7 @@ import org.apache.mina.common.IoSession;
 import org.lastbamboo.common.stun.stack.message.attributes.turn.ConnectionStatus;
 import org.lastbamboo.common.stun.stack.message.turn.ConnectionStatusIndication;
 import org.lastbamboo.common.stun.stack.message.turn.DataIndication;
+import org.lastbamboo.common.turn.server.allocated.TcpAllocatedTurnServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

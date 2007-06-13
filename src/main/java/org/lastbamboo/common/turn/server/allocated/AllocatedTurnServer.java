@@ -1,4 +1,4 @@
-package org.lastbamboo.common.turn.server;
+package org.lastbamboo.common.turn.server.allocated;
 
 /**
  * Interface for a TURN server created in response to a TURN Allocate Request

@@ -1,10 +1,11 @@
-package org.lastbamboo.common.turn.server;
+package org.lastbamboo.common.turn.server.allocated;
 
 
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.lastbamboo.common.stun.stack.message.turn.DataIndication;
+import org.lastbamboo.common.turn.server.TurnClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

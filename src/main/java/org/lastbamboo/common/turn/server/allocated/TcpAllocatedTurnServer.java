@@ -1,4 +1,4 @@
-package org.lastbamboo.common.turn.server;
+package org.lastbamboo.common.turn.server.allocated;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -15,6 +15,7 @@ import org.apache.mina.common.IoServiceListener;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.SimpleByteBufferAllocator;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
+import org.lastbamboo.common.turn.server.TurnClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
