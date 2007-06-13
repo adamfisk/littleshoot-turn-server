@@ -3,6 +3,7 @@ package org.lastbamboo.common.turn.server;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
+import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
@@ -33,6 +34,12 @@ public final class TurnClientManagerImpl implements TurnClientManager
     private final RandomNonCollidingPortGenerator m_portGenerator;
     
     /**
+     * The {@link Timer} for TURN allocation LIFETIME expirations.  We hold
+     * one timer for all TURN clients because each timer uses a thread.
+     */
+    private final Timer m_lifetimeTimer = new Timer();
+    
+    /**
      * Manager for clients this TURN server is relaying data on behalf of.
      * 
      * @param portGenerator Class for generating ports to use for new clients.
@@ -45,25 +52,35 @@ public final class TurnClientManagerImpl implements TurnClientManager
     
     public TurnClient allocateBinding(final IoSession ioSession) 
         {
-        final int newPort = this.m_portGenerator.createRandomPort();
-        try
+        if (this.m_clientMappings.containsKey(ioSession))
             {
-            final InetSocketAddress allocatedAddress = 
-                new InetSocketAddress(NetworkUtils.getLocalHost(), newPort);
-            
-            final TurnClient turnClient = 
-                new TurnClientImpl(allocatedAddress, ioSession);
-            turnClient.startServer();
-            this.m_clientMappings.put(ioSession, turnClient);
-            
-            return turnClient;
+            final TurnClient client = this.m_clientMappings.get(ioSession);
+            client.resetLifetime();
+            return client;
             }
-        catch (final UnknownHostException e)
+        else
             {
-            // Should never happen.
-            LOG.error("Could not resolve host", e);
-            this.m_portGenerator.removePort(newPort);
-            return null;
+            final int newPort = this.m_portGenerator.createRandomPort();
+            try
+                {
+                final InetSocketAddress allocatedAddress = 
+                    new InetSocketAddress(NetworkUtils.getLocalHost(), newPort);
+                
+                final TurnClient turnClient = 
+                    new TurnClientImpl(allocatedAddress, ioSession, 
+                        this.m_lifetimeTimer);
+                turnClient.startServer();
+                this.m_clientMappings.put(ioSession, turnClient);
+                
+                return turnClient;
+                }
+            catch (final UnknownHostException e)
+                {
+                // Should never happen.
+                LOG.error("Could not resolve host", e);
+                this.m_portGenerator.removePort(newPort);
+                return null;
+                }
             }
         }
 

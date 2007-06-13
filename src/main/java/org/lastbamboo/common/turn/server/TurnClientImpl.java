@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.map.LRUMap;
@@ -74,6 +76,17 @@ public final class TurnClientImpl implements TurnClient
 
     private TcpAllocatedTurnServer m_allocatedTurnServer;
 
+    private final Timer m_lifetimeTimer;
+
+    private final TimerTask m_lifetimeTimerTask;
+
+    /**
+     * The default LIFETIME for allocated TURN servers.  Servers are 
+     * automatically closed if they are not refreshed with subsequent
+     * Allocate Requests before the defaul time.
+     */
+    private static final int DEFAULT_LIFETIME = 1000*60*10;
+
     /**
      * Creates a new TURN client abstraction for the specified TURN client
      * address and port.
@@ -82,12 +95,24 @@ public final class TurnClientImpl implements TurnClient
      * will report as its own address and port when communicating with other
      * clients.
      * @param ioSession The handler for writing data back to the TURN client.
+     * @param lifetimeTimer The timer for the lifetime to wait before 
+     * expiring TURN allocations.
      */
     public TurnClientImpl(final InetSocketAddress allocatedAddress,
-        final IoSession ioSession)
+        final IoSession ioSession, final Timer lifetimeTimer)
         {
         this.m_allocatedAddress = allocatedAddress;
         this.m_ioSession = ioSession;
+        this.m_lifetimeTimer = lifetimeTimer;
+        this.m_lifetimeTimerTask = new TimerTask()
+            {
+            @Override
+            public void run()
+                {
+                // Close the TURN allocation.
+                m_allocatedTurnServer.stop();
+                }
+            };
         }
 
     public void startServer()
@@ -95,6 +120,7 @@ public final class TurnClientImpl implements TurnClient
         this.m_allocatedTurnServer = 
             new TcpAllocatedTurnServer(this, this.m_allocatedAddress.getPort());
         this.m_allocatedTurnServer.start();
+        resetLifetime();
         }
 
     public boolean write(final InetSocketAddress remoteAddress,
@@ -172,6 +198,26 @@ public final class TurnClientImpl implements TurnClient
     public IoSession getIoSession()
         {
         return this.m_ioSession;
+        }
+    
+    public void resetLifetime()
+        {
+        // If the timer hasn't run yet, then we just reset it and don't have
+        // to worry about restarting the allocated TURN server.
+        if (this.m_lifetimeTimerTask.cancel())
+            {
+            // Schedule the same task again for execution after the default
+            // lifetime.
+            this.m_lifetimeTimer.schedule(this.m_lifetimeTimerTask, 
+                DEFAULT_LIFETIME);
+            }
+        // Otherwise, tell the allocated TURN server to start again.  This 
+        // should not happen in normal operation, as clients should be 
+        // configured to send new allocate request before the server closes.
+        else
+            {
+            this.m_allocatedTurnServer.start();
+            }
         }
 
     public boolean hasActiveDestination()
@@ -255,8 +301,6 @@ public final class TurnClientImpl implements TurnClient
     private InetSocketAddress normalizeSocketAddress(final IoSession session)
         {
         return (InetSocketAddress) session.getRemoteAddress();
-        //return new InetSocketAddress(socketAddress.getAddress(), 
-          //  socketAddress.getPort());
         }
 
     /**
@@ -267,10 +311,4 @@ public final class TurnClientImpl implements TurnClient
         return m_connections.size();
         }
 
-    /*
-    public String toString()
-        {
-        return "TurnClientImpl managing connections for: "+this.m_ioSession;
-        }
-        */
     }

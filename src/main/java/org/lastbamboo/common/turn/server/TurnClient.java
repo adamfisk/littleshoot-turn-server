@@ -114,4 +114,9 @@ public interface TurnClient
      */
     void onRemoteHostData(InetSocketAddress remoteAddress, byte[] data);
 
+    /**
+     * Resets the lifetime for this allocation.
+     */
+    void resetLifetime();
+
     }
