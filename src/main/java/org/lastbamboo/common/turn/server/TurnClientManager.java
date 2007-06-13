@@ -1,6 +1,6 @@
 package org.lastbamboo.common.turn.server;
 
-import org.lastbamboo.common.protocol.ReaderWriter;
+import org.apache.mina.common.IoSession;
 
 /**
  * Interface for classes that manage allocated binding for TURN clients.  These
@@ -17,7 +17,7 @@ public interface TurnClientManager
      * @param readerWriter The class for writing data back to the TURN client.
      * @return The client proxy.
      */
-    TurnClient allocateBinding(final ReaderWriter readerWriter);
+    TurnClient allocateBinding(final IoSession readerWriter);
 
     /**
      * Accessor for the TURN client handler for the specified TURN client 
@@ -26,7 +26,7 @@ public interface TurnClientManager
      * @return The TURN client class that handles writing data to the client
      * and accepting incoming connection on the client's behalf.
      */
-    TurnClient getTurnClient(final ReaderWriter readerWriter);
+    TurnClient getTurnClient(final IoSession readerWriter);
 
     /**
      * Removes the TURN client associated with the specified reader/writer
@@ -34,6 +34,6 @@ public interface TurnClientManager
      * @param readerWriter The reader/writer to remove.
      * @return The removed client instance.
      */
-    TurnClient removeBinding(final ReaderWriter readerWriter);
+    TurnClient removeBinding(final IoSession readerWriter);
 
     }

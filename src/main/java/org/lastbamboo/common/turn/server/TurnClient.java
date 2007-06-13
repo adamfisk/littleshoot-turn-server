@@ -1,11 +1,9 @@
 package org.lastbamboo.common.turn.server;
 
-import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 
-import org.lastbamboo.common.protocol.ReaderWriter;
+import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoSession;
 
 /**
  * Interface for classes that keep track of data for TURN clients that this
@@ -24,24 +22,20 @@ public interface TurnClient
      * @param remoteAddress The IP address and port of the remote host to send
      * data to.
      * @param data The data to send the remote host.
-     * @throws IOException If we could not enable writing on this channel.
      * @return <code>true</code> if the data was send to an existing binding.
      * Otherwise, this returns <code>false</code> to indicate that there was
      * no existing matching 5-tuple for the remote host and that we're
      * attempting to connect to that remote host.
      */
-    boolean write(final InetSocketAddress remoteAddress, final ByteBuffer data)
-        throws IOException;
-
+    boolean write(InetSocketAddress remoteAddress, ByteBuffer data);
+    
     /**
-     * Checks whether or not the specified address has permission to send
-     * incoming data to this TURN client.  It has permission only if the client
-     * has issued a SEND-REQUEST to the remote address.
-     * @param address The remote address to check for permissions.
-     * @return <code>true</code> if the remote address has permission to send
-     * incoming data, otherwise <code>false</code>.
+     * Tells the client to appropriately handle a connect request to the 
+     * specified remote host.
+     * 
+     * @param socketAddress The address to handle.
      */
-    boolean hasIncomingPermission(final InetAddress address);
+    void handleConnect(InetSocketAddress socketAddress);
 
     /**
      * Accessor for the IP and port this server has allocated on behalf of the
@@ -60,7 +54,7 @@ public interface TurnClient
      * Accessor for the handler for reading and writing data with this client.
      * @return The handler for reading and writing data with this client.
      */
-    ReaderWriter getReaderWriter();
+    IoSession getIoSession();
 
     /**
      * Returns whether or not the TURN client has set its "active destination"
@@ -69,18 +63,36 @@ public interface TurnClient
      * otherwise <code>false</code>.
      */
     boolean hasActiveDestination();
+    
+    /**
+     * Returns whether or not the remote host who created the specified 
+     * session has permission to open a connection to this TURN client.  The
+     * remote host has permission if the TURN client has issued a connect
+     * request to that host that is still active.
+     * 
+     * @param session The connection from the remote host.
+     * @return <code>true</code> if the remote host has permission to connect
+     * to the TURN client, otherwise <code>false</code>.
+     */
+    boolean hasIncomingPermission(IoSession session);
 
     /**
      * Adds the specified connection for this TURN client.  This is typically
      * called when a remote host makes a connection to the TURN server.
      *
-     * @param destinationAddress The IP address fo the remote host.
-     * @param readerWriter The class for reading and writing data with the
+     * @param session The class for reading and writing data with the
      * remote host.
      */
-    void addConnection(final InetSocketAddress destinationAddress,
-        final ReaderWriter readerWriter);
+    void addConnection(IoSession session);
 
+    /**
+     * Removes the connection.
+     * 
+     * @param session The class for reading and writing data with the
+     * remote host.
+     */
+    void removeConnection(IoSession session);
+    
     /**
      * Returns the number of connections for this TURN client.
      *
@@ -93,4 +105,13 @@ public interface TurnClient
      * for accepting connections from remote hosts.
      */
     void startServer();
+
+    /**
+     * Called when we've received data from a remote host.
+     * 
+     * @param remoteAddress The host the data arrived from.
+     * @param data The received data.
+     */
+    void onRemoteHostData(InetSocketAddress remoteAddress, byte[] data);
+
     }

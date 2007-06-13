@@ -1,26 +1,23 @@
 package org.lastbamboo.common.turn.server;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
+import java.net.SocketAddress;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.map.LRUMap;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.lastbamboo.common.nio.AcceptorListener;
-import org.lastbamboo.common.nio.NioServer;
-import org.lastbamboo.common.nio.NioServerImpl;
-import org.lastbamboo.common.nio.ReadWriteConnectorImpl;
-import org.lastbamboo.common.nio.SelectorManager;
-import org.lastbamboo.common.protocol.ReadWriteConnector;
-import org.lastbamboo.common.protocol.ReadWriteConnectorListener;
-import org.lastbamboo.common.protocol.ReaderWriter;
-import org.lastbamboo.common.turn.message.TurnMessageFactory;
+import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.IoSession;
+import org.lastbamboo.common.stun.stack.message.attributes.turn.ConnectionStatus;
+import org.lastbamboo.common.stun.stack.message.turn.ConnectionStatusIndication;
+import org.lastbamboo.common.stun.stack.message.turn.DataIndication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -37,14 +34,14 @@ import org.lastbamboo.common.turn.message.TurnMessageFactory;
  * TODO: Only allow permissions for a fixed LIFETIME (I think that's the
  * TURN attribute).
  */
-public final class TurnClientImpl implements TurnClient,
-    ReadWriteConnectorListener
+public final class TurnClientImpl implements TurnClient
     {
 
     /**
      * Logger for this class.
      */
-    private static final Log LOG = LogFactory.getLog(TurnClientImpl.class);
+    private static final Logger LOG = 
+        LoggerFactory.getLogger(TurnClientImpl.class);
 
     private final InetSocketAddress m_allocatedAddress;
 
@@ -52,17 +49,8 @@ public final class TurnClientImpl implements TurnClient,
      * <code>Map</code> of <code>InetSocketAddress</code>es to handler for
      * writing to those connections.
      */
-    private final Map m_connections = new ConcurrentHashMap();
-
-    /**
-     * <code>Map</code> of <code>InetSocketAddress</code>es to
-     * <code>ByteBuffer</code>s for sending data to hosts we don't have a
-     * connection to yet. This is cleared if we're unable to connect to the
-     * remote host.
-     */
-    private final Map m_pendingData = new ConcurrentHashMap();
-
-    private final SelectorManager m_selectorManager;
+    private final Map<InetSocketAddress, IoSession> m_connections = 
+        new ConcurrentHashMap<InetSocketAddress, IoSession>();
 
     /**
      * The addresses that the TURN client has issues SEND-REQUESTS to, giving
@@ -72,17 +60,18 @@ public final class TurnClientImpl implements TurnClient,
      * unfortunately no LRUSet.  We limit the size instead of worrying about
      * the TURN LIFETIME attribute for now.
      */
-    private final Map m_permittedAddresses =
+    private final Map<InetAddress, InetAddress> m_permittedAddresses =
         Collections.synchronizedMap(new LRUMap(100));
-
-    private final ReaderWriter m_readerWriter;
-
-    private final TurnMessageFactory m_turnMessageFactory;
-
+    
     /**
-     * Server that processing incoming connections to the TURN client.
+     * The set of remote hosts the client has issued connect requests for.
      */
-    private NioServer m_nioServer;
+    private final Set<InetAddress> m_trackedRemoteHosts =
+        Collections.synchronizedSet(new HashSet<InetAddress>());
+
+    private final IoSession m_ioSession;
+
+    private TcpAllocatedTurnServer m_allocatedTurnServer;
 
     /**
      * Creates a new TURN client abstraction for the specified TURN client
@@ -91,158 +80,59 @@ public final class TurnClientImpl implements TurnClient,
      * on behalf of the TURN client.  This is the address and port the client
      * will report as its own address and port when communicating with other
      * clients.
-     * @param readerWriter The handler for writing data back to the TURN client.
-     * @param manager Manager for the NIO selector.
-     * @param messageFactory The factory for creating TURN messages.
+     * @param ioSession The handler for writing data back to the TURN client.
      */
     public TurnClientImpl(final InetSocketAddress allocatedAddress,
-        final ReaderWriter readerWriter, final SelectorManager manager,
-        final TurnMessageFactory messageFactory)
+        final IoSession ioSession)
         {
         this.m_allocatedAddress = allocatedAddress;
-        this.m_readerWriter = readerWriter;
-        this.m_selectorManager = manager;
-        this.m_turnMessageFactory = messageFactory;
+        this.m_ioSession = ioSession;
         }
 
     public void startServer()
         {
-        LOG.trace("Starting server on thread: "+
-            Thread.currentThread().getName());
-
-        // Note that we use the same selector for all servers.
-        final AcceptorListener listener =
-            new RemoteHostAcceptorListener(this, this.m_selectorManager,
-                this.m_turnMessageFactory);
-        this.m_nioServer = new NioServerImpl(this.m_allocatedAddress.getPort(),
-            this.m_selectorManager, listener);
-        try
-            {
-            this.m_nioServer.startServer();
-            }
-        catch (final IOException e)
-            {
-            // Should never happen.
-            LOG.fatal("Could not start server", e);
-            }
+        this.m_allocatedTurnServer = 
+            new TcpAllocatedTurnServer(this, this.m_allocatedAddress.getPort());
+        this.m_allocatedTurnServer.start();
         }
 
     public boolean write(final InetSocketAddress remoteAddress,
-        final ByteBuffer data) throws IOException
+        final ByteBuffer data) 
         {
-        if (LOG.isDebugEnabled())
+        final IoSession session = this.m_connections.get(remoteAddress);
+        if (session == null)
             {
-            LOG.debug("Writing " + data.remaining() + " bytes of data to: " +
+            // The remote host likely just disconnected, and we should have
+            // properly informed the TURN client with a connection status
+            // message.  This will happen periodically if the TURN client
+            // has sent a little extra data.
+            LOG.debug("Attempting to send data to host that's not there: "+ 
                 remoteAddress);
-            }
-        try
-            {
-            return writeToRemoteHost(remoteAddress, data);
-            }
-        catch (final IOException e)
-            {
-            LOG.debug("Could not write data to remote host", e);
-            // Remove all connection to the remote address internally.
-            remove(remoteAddress);
-            throw e;
-            }
-        }
-
-    private boolean writeToRemoteHost(final InetSocketAddress remoteAddress,
-        final ByteBuffer data) throws IOException
-        {
-        final ReaderWriter readerWriter =
-            (ReaderWriter) this.m_connections.get(remoteAddress);
-        if (readerWriter == null)
-            {
-            // This will happen when clients send empty TURN Send Requests to
-            // open permissions for that user.  This is the TURN server
-            // acting like a cone NAT, where it will only allow incoming data
-            // from remote hosts that TURN clients have sent outgoing data
-            // to.  So, an empty Send Request should always be the TURN
-            // client opening permissions to a specific host.
-            //
-            // If there is data, and we're opening a connection, then there
-            // might be something wrong, and we issue a warning.
-            LOG.trace("Opening new connection to host...");
-            if (data.capacity() != 0)
-                {
-                LOG.warn("Opening new connection to host with data!!!");
-                }
-            addPermission(remoteAddress.getAddress());
-            addPendingData(remoteAddress, data);
-            connect(remoteAddress);
             return false;
             }
         else
             {
-            LOG.trace("Writing data using existing connection...");
-            readerWriter.write(data);
+            LOG.debug("Writing data using existing connection...");
+            session.write(data);
             return true;
             }
         }
-
-    private void remove(final InetSocketAddress remoteAddress)
+    
+    public void onRemoteHostData(final InetSocketAddress remoteAddress,
+        final byte[] data)
         {
-        LOG.trace("Removing remote address: "+remoteAddress);
-
-        // We don't remove the permission for this host here because we still
-        // want to allow connections from it.  This should technically be
-        // tied to the binding's LIFETIME attribute, but we don't yet
-        // implement that.
-        this.m_pendingData.remove(remoteAddress);
-        this.m_connections.remove(remoteAddress);
+        final DataIndication indication = 
+            new DataIndication(remoteAddress, data);
+        this.m_ioSession.write(indication);
         }
-
-    private void addPermission(final InetAddress address)
+    
+    public void handleConnect(final InetSocketAddress remoteAddress)
         {
+        LOG.debug("Adding connect permission for: {}  {}", remoteAddress, this);
+        final InetAddress address = remoteAddress.getAddress();
         this.m_permittedAddresses.put(address, address);
-        }
-
-    private void addPendingData(final InetSocketAddress remoteAddress,
-        final ByteBuffer data)
-        {
-        if (data.capacity() != 0)
-            {
-            this.m_pendingData.put(remoteAddress, data);
-            }
-        }
-
-    private void connect(final InetSocketAddress remoteAddress)
-        throws IOException
-        {
-        final ReadWriteConnector connector =
-            new ReadWriteConnectorImpl(this.m_selectorManager, remoteAddress,
-                this);
-        connector.connect();
-
-        }
-
-    public void onConnect(final ReaderWriter readerWriter) throws IOException
-        {
-        LOG.trace("Connected to server...");
-        final InetSocketAddress remoteAddress =
-            readerWriter.getRemoteSocketAddress();
-        final ByteBuffer data =
-            (ByteBuffer) this.m_pendingData.remove(remoteAddress);
-
-        if (data != null)
-            {
-            LOG.trace("Writing pending data...");
-            readerWriter.write(data);
-            }
-        addConnection(remoteAddress, readerWriter);
-        }
-
-    public void onConnectFailed(final InetSocketAddress remoteAddress)
-        {
-        // Just remove the host from any pending writes.
-        this.m_pendingData.remove(remoteAddress);
-        }
-
-    public boolean hasIncomingPermission(final InetAddress address)
-        {
-        return this.m_permittedAddresses.containsKey(address);
+        this.m_trackedRemoteHosts.add(address);
+        updateConnectionStatus(remoteAddress, ConnectionStatus.LISTEN);
         }
 
     public InetSocketAddress getAllocatedSocketAddress()
@@ -254,14 +144,15 @@ public final class TurnClientImpl implements TurnClient,
         {
         if (LOG.isDebugEnabled())
             {
-            LOG.debug("Closing client at: " + this.m_readerWriter);
+            LOG.debug("Closing client at: " + this.m_ioSession);
             }
-        this.m_nioServer.close();
-        this.m_pendingData.clear();
-        this.m_permittedAddresses.clear();
-
         closeAllConnections();
+        this.m_allocatedTurnServer.stop();
         this.m_connections.clear();
+        this.m_permittedAddresses.clear();
+        
+        // The session is probably already closed, but just make sure.
+        this.m_ioSession.close();
         }
 
     /**
@@ -269,17 +160,17 @@ public final class TurnClientImpl implements TurnClient,
      */
     private void closeAllConnections()
         {
-        final Iterator iter = this.m_connections.values().iterator();
+        final Iterator<IoSession> iter = this.m_connections.values().iterator();
         while (iter.hasNext())
             {
-            final ReaderWriter readerWriter = (ReaderWriter) iter.next();
+            final IoSession readerWriter = iter.next();
             readerWriter.close();
             }
         }
 
-    public ReaderWriter getReaderWriter()
+    public IoSession getIoSession()
         {
-        return this.m_readerWriter;
+        return this.m_ioSession;
         }
 
     public boolean hasActiveDestination()
@@ -288,23 +179,83 @@ public final class TurnClientImpl implements TurnClient,
         return false;
         }
 
-    public void addConnection(final InetSocketAddress socketAddress,
-        final ReaderWriter readerWriter)
+    public void removeConnection(final IoSession session)
         {
-        LOG.trace("Adding connection to: "+socketAddress);
+        LOG.debug("Removing connection to: {}", session);
+        final InetSocketAddress remoteAddress = normalizeSocketAddress(session);
+        final IoSession connection = this.m_connections.remove(remoteAddress);
 
-        // Make sure the host has permissions.
-        /*
-        if (!hasIncomingPermission(socketAddress.getAddress()))
+        // The connection can be null if a host attempted to connect that 
+        // never had permission to, and we've closed it.  That will generate
+        // this event.
+        if (connection != null)
             {
-            LOG.warn("No permissions for host: "+socketAddress.getAddress());
-            throw new IllegalArgumentException("No permissions for host: "+
-                socketAddress.getAddress());
+            // It's probably already closed, but just in case.
+            connection.close();
+            updateConnectionStatus(remoteAddress, ConnectionStatus.CLOSED);
             }
-            */
-        this.m_connections.put(socketAddress, readerWriter);
-        addPermission(socketAddress.getAddress());
-        LOG.trace("Now "+this.m_connections.size()+" connection(s)...");
+        }
+    
+    public void addConnection(final IoSession session) 
+        {
+        final InetSocketAddress socketAddress = normalizeSocketAddress(session);
+        // Make sure the host has permissions.
+        if (!hasIncomingPermission(session))
+            {
+            // This could possibly happen if another thread removed 
+            // the host's incoming permission.  Just close the session here.
+            LOG.debug("No permissions for host: "+socketAddress.getAddress());
+            session.close();
+            }
+        else
+            {
+            this.m_connections.put(socketAddress, session);
+            updateConnectionStatus(socketAddress, ConnectionStatus.ESTABLISHED);
+            if (LOG.isDebugEnabled())
+                {
+                LOG.debug("Now "+this.m_connections.size()+" connection(s)...");
+                }
+            }
+        }
+
+    private void updateConnectionStatus(final InetSocketAddress remoteAddress, 
+        final ConnectionStatus status)
+        {
+        final ConnectionStatusIndication indication = 
+            new ConnectionStatusIndication(remoteAddress, status);
+        this.m_ioSession.write(indication);
+        }
+
+    public boolean hasIncomingPermission(final IoSession session)
+        {
+        LOG.debug("Checking permissions for: {}", session);
+        final InetSocketAddress socketAddress = normalizeSocketAddress(session);
+        
+        final boolean hasPermission = 
+            m_trackedRemoteHosts.contains(socketAddress.getAddress());
+        LOG.debug("{} returning permission: {}", this, 
+            new Boolean(hasPermission));
+        return hasPermission;
+        }
+
+    /**
+     * This method takes the {@link SocketAddress} from the session and 
+     * normalizes it.  This is necessary because {@link InetSocketAddress}es
+     * can contain textual information in addition to the IP address and port.
+     * This information may or may not be present depending on where the
+     * information came from, requiring it to be normalized so that socket
+     * addresses match as {@link Map} keyps.
+     * 
+     * @param session The session containing the {@link InetSocketAddress} to
+     * normalize.
+     * 
+     * @return The normalized {@link InetSocketAddress}.
+     */
+    private InetSocketAddress normalizeSocketAddress(final IoSession session)
+        {
+        return (InetSocketAddress) session.getRemoteAddress();
+        //return new InetSocketAddress(socketAddress.getAddress(), 
+          //  socketAddress.getPort());
         }
 
     /**
@@ -315,8 +266,10 @@ public final class TurnClientImpl implements TurnClient,
         return m_connections.size();
         }
 
+    /*
     public String toString()
         {
-        return "TurnClientImpl managing connections for: "+this.m_readerWriter;
+        return "TurnClientImpl managing connections for: "+this.m_ioSession;
         }
+        */
     }

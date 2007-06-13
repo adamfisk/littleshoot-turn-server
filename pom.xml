@@ -23,12 +23,7 @@
 
         <dependency>
             <groupId>org.lastbamboo</groupId>
-            <artifactId>lastbamboo-common-nio</artifactId>
-            </dependency>
-
-        <dependency>
-            <groupId>org.lastbamboo</groupId>
-            <artifactId>lastbamboo-common-turn-stack</artifactId>
+            <artifactId>lastbamboo-common-stun-stack</artifactId>
             </dependency>
 
         <dependency>

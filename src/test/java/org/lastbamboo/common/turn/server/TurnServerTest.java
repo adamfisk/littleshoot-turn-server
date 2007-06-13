@@ -2,34 +2,35 @@ package org.lastbamboo.common.turn.server;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.Map;
+import java.util.Scanner;
 
-import org.apache.commons.id.uuid.UUID;
+import junit.framework.TestCase;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.lastbamboo.common.turn.TurnConstants;
-import org.lastbamboo.common.turn.message.AllocateRequest;
-import org.lastbamboo.common.turn.message.SendRequest;
-import org.lastbamboo.common.turn.message.TurnMessageFactory;
-import org.lastbamboo.common.turn.message.TurnMessageTypes;
-import org.lastbamboo.common.turn.message.attribute.StunAttributeTypes;
-import org.lastbamboo.common.turn.message.attribute.TurnAttributeTypes;
-import org.lastbamboo.common.turn.server.TurnServer;
+import org.apache.mina.common.ByteBuffer;
+import org.lastbamboo.common.stun.stack.encoder.StunMessageEncoder;
+import org.lastbamboo.common.stun.stack.message.StunMessage;
+import org.lastbamboo.common.stun.stack.message.StunMessageType;
+import org.lastbamboo.common.stun.stack.message.attributes.MappedAddress;
+import org.lastbamboo.common.stun.stack.message.attributes.StunAttribute;
+import org.lastbamboo.common.stun.stack.message.attributes.StunAttributeType;
+import org.lastbamboo.common.stun.stack.message.attributes.StunAttributesFactory;
+import org.lastbamboo.common.stun.stack.message.attributes.StunAttributesFactoryImpl;
+import org.lastbamboo.common.stun.stack.message.attributes.turn.DataAttribute;
+import org.lastbamboo.common.stun.stack.message.turn.AllocateRequest;
+import org.lastbamboo.common.stun.stack.message.turn.ConnectRequest;
+import org.lastbamboo.common.stun.stack.message.turn.SendIndication;
 import org.lastbamboo.common.util.NetworkUtils;
-import org.lastbamboo.common.util.Unsigned;
-import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+import org.lastbamboo.common.util.mina.MinaUtils;
 
 /**
  * Tests the TURN servers response to all TURN requests.
  */
-public final class TurnServerTest
-    extends AbstractDependencyInjectionSpringContextTests
+public final class TurnServerTest extends TestCase
     {
 
     /**
@@ -37,51 +38,27 @@ public final class TurnServerTest
      */
     private static final Log LOG = LogFactory.getLog(TurnServerTest.class);
 
-    private static Socket s_turnClientSocket;
+    private Socket m_turnClientSocket;
 
-    private static TurnMessageFactory s_turnMessageFactory;
+    private TurnServer m_server;
 
-    private static final int TEST_SERVER_PORT = 57686;
-
-    private static final String[] s_configLocations =
-        new String[]
-            {
-            "turnStackBeans.xml",
-            "turnServerBeans.xml"
-            };
-
-    private volatile boolean m_notified;
-
-    private volatile boolean m_retrievedTestString;
-
-    protected String[] getConfigLocations()
+    protected void setUp() throws Exception
         {
-        return s_configLocations;
-        }
-
-    public void onSetUp() throws Exception
-        {
-        LOG.trace("Setting up test...");
-        this.m_notified = false;
-        this.m_retrievedTestString = false;
-        if (s_turnClientSocket != null)
+        if (m_turnClientSocket != null && m_server != null)
             {
             return;
             }
 
-        final TurnServer server =
-            (TurnServer) applicationContext.getBean("turnServer");
-        server.start();
-        Thread.sleep(2000);
-        s_turnClientSocket =
-            new Socket(NetworkUtils.getLocalHost(),
-                       TurnConstants.DEFAULT_SERVER_PORT);
-
-        s_turnClientSocket.setSoTimeout(4000);
-
-        s_turnMessageFactory =
-            (TurnMessageFactory) applicationContext.getBean(
-                "turnMessageFactory");
+        m_server = new TcpTurnServer();
+        m_server.start();
+        Thread.sleep(1000);
+        m_turnClientSocket = new Socket(NetworkUtils.getLocalHost(), 3478);
+        }
+    
+    protected void tearDown() throws Exception
+        {
+        m_turnClientSocket.close();
+        m_server.stop();
         }
 
     /**
@@ -91,259 +68,171 @@ public final class TurnServerTest
      */
     public void testGeneralMessages() throws Exception
         {
-        final AllocateRequest request =
-            s_turnMessageFactory.createAllocateRequest();
-        Collection buffers = request.toByteBuffers();
-        final OutputStream turnClientOutputStream =
-            s_turnClientSocket.getOutputStream();
-        for (final Iterator iter = buffers.iterator(); iter.hasNext();)
-            {
-            final ByteBuffer curBuffer = (ByteBuffer) iter.next();
-            turnClientOutputStream.write(curBuffer.array());
-            }
-        turnClientOutputStream.flush();
-
-        final InputStream is = s_turnClientSocket.getInputStream();
-
-        final ByteBuffer responseBuffer = ByteBuffer.allocate(32);
-
-        LOG.trace("*************** reading response...");
-        while (responseBuffer.hasRemaining())
-            {
-            responseBuffer.put((byte) is.read());
-            }
-        responseBuffer.flip();
-        short type = responseBuffer.getShort();
-        assertEquals(type, TurnMessageTypes.ALLOCATE_RESPONSE);
-        final short length = responseBuffer.getShort();
-        assertEquals(12, length);
-
-        final byte[] transactionIdBytes = new byte[16];
-        responseBuffer.get(transactionIdBytes);
-        final UUID transactionId = new UUID(transactionIdBytes);
-        assertEquals(request.getTransactionId(), transactionId);
-        final short attributeType = responseBuffer.getShort();
-        assertEquals(StunAttributeTypes.MAPPED_ADDRESS, attributeType);
-
-        final short attributeLength = responseBuffer.getShort();
-        assertEquals(8, attributeLength);
-        responseBuffer.getShort();
-        final int port = responseBuffer.getShort() & 0xffff;
-
-        final byte[] ip = new byte[4];
-        responseBuffer.get(ip);
-        final InetAddress address = InetAddress.getByAddress(ip);
+        final AllocateRequest allocateRequest = new AllocateRequest();
+        
+        write(m_turnClientSocket, allocateRequest);
+        
+        Map<Integer, StunAttribute> allocateResponseAttributes = 
+            readMessage(m_turnClientSocket, 
+                StunMessageType.SUCCESSFUL_ALLOCATE_RESPONSE,
+                StunAttributeType.MAPPED_ADDRESS, 8);
+        final MappedAddress ma = (MappedAddress) allocateResponseAttributes.get(
+            new Integer(StunAttributeType.MAPPED_ADDRESS));
+        final InetSocketAddress allocatedSocketAddress = 
+            ma.getInetSocketAddress();
+        // Done reading the allocate response.  We'll use this to connect to
+        // the TURN client.
+        
 
         // Now make sure we're rejected from connecting to that address since we
-        // have not sent a Send Request to it yet...
-        LOG.trace("About to start socket for remote client***************");
-        //final Socket remoteClientSocket = new Socket(address, port);
-        //remoteClientSocket.setSoTimeout(6000);
+        // have not sent a Connect Request to it yet...
+        LOG.trace("About to start socket for remote client");
+        Socket remoteHostSocket = new Socket();
+        remoteHostSocket.connect(allocatedSocketAddress);
+        remoteHostSocket.setSoTimeout(6000);
+        
         LOG.trace("Started socket....");
-        //final InputStream readStream = remoteClientSocket.getInputStream();
+        final InputStream readStream = remoteHostSocket.getInputStream();
 
         // Make sure the stream is dead.
-        //assertEquals(-1, readStream.read());
-
-        final InetSocketAddress localHost =
-            new InetSocketAddress(NetworkUtils.getLocalHost(), TEST_SERVER_PORT);
-
-        LOG.trace("**************************Running server...");
-        runThreadedTestServer();
-        Thread.sleep(1000);
-
-        synchronized(this)
-            {
-            int count = 0;
-            while (!this.m_notified && count < 3)
-                {
-                wait(3000);
-                count++;
-                }
-            }
-
-        assertTrue("Did not connect to remote host", this.m_notified);
-
-        LOG.trace("**************************About to wait...");
-        final ByteBuffer sendDataBuffer =
-            ByteBuffer.allocate(TEST_STRING.length());
-        sendDataBuffer.put(TEST_STRING.getBytes());
-        sendDataBuffer.rewind();
-        final SendRequest sendRequest =
-            s_turnMessageFactory.createSendRequest(localHost, sendDataBuffer);
-        LOG.trace("Sending send request with id: "+
-            sendRequest.getTransactionId());
-
-        buffers = sendRequest.toByteBuffers();
-
-        for (final Iterator iter = buffers.iterator(); iter.hasNext();)
-            {
-            final ByteBuffer curBuffer = (ByteBuffer) iter.next();
-            turnClientOutputStream.write(curBuffer.array());
-            }
-        turnClientOutputStream.flush();
-
-        synchronized(this)
-            {
-            int count = 0;
-            while (!this.m_retrievedTestString && count < 3)
-                {
-                wait(6000);
-                count++;
-                }
-            }
-
-        assertTrue(this.m_retrievedTestString);
-
-        // Read the send response.
-        verifySendResponse(is, sendRequest);
-
-        // Make sure that data indication messages are sent appropriately.
-        verifyDataIndication(is, address, port);
+        assertEquals(-1, readStream.read());
+        remoteHostSocket.close();
+        
+        // Now send a connect request for that client.  This will just open
+        // permissions for the remote host.
+        final InetSocketAddress remoteHostAddress = 
+            new InetSocketAddress("127.0.0.1", 52811);
+        final ConnectRequest connectRequest = 
+            new ConnectRequest(remoteHostAddress);
+        write(m_turnClientSocket, connectRequest);
+        LOG.debug("Wrote connect request");
+        
+        // The server will generate a connection status indication in response
+        // to the connect request.  Process it!
+        LOG.debug("Processing connection status...");
+        Map<Integer, StunAttribute> messageAttributes = 
+            readMessage(m_turnClientSocket, 
+                StunMessageType.CONNECTION_STATUS_INDICATION,
+                StunAttributeType.CONNECT_STAT, 4);
+        LOG.debug("Processed connection status");
+        
+        // Now the remote host should have permission to connect, so connect it.
+        remoteHostSocket = new Socket();
+        // We just store this for future use.  It's the address of the "remote"
+        // host.
+        remoteHostSocket.bind(remoteHostAddress);
+        remoteHostSocket.connect(allocatedSocketAddress);
+        assertTrue(remoteHostSocket.isConnected());
+        assertTrue(remoteHostSocket.isBound());
+        LOG.debug("Remote host connected successfully!");
+        
+        // The server again sends a connect status because the client is now
+        // connected!!
+        messageAttributes = readMessage(m_turnClientSocket, 
+            StunMessageType.CONNECTION_STATUS_INDICATION,
+            StunAttributeType.CONNECT_STAT, 4);
+        
+        // Send the TURN client arbitrary data from the remote host.  Then
+        // we'll make sure it receives it in a data indication.
+        final String remoteHostMessage = "HELLO FROM YOUR REMOTE HOST";
+        write(remoteHostSocket, remoteHostMessage);
+        
+        LOG.debug("Reading data indication...");
+        messageAttributes = 
+            readMessage(m_turnClientSocket, StunMessageType.DATA_INDICATION,
+            StunAttributeType.DATA, remoteHostMessage.length());
+        
+        final DataAttribute dataAttribute = 
+            (DataAttribute) messageAttributes.get(
+                new Integer(StunAttributeType.DATA));
+       
+        assertEquals(remoteHostMessage, 
+            new String(dataAttribute.getData(), "US-ASCII"));
+        // Done with remote host data check.
+        
+        
+        // Now send data from the TURN client socket.  We'll wrap this in a
+        // Send Indication, but the remote host should receive it as raw data.
+        final String turnClientMessage = 
+            "HELLOW FROM YOUR FRIENDLY TURN CLIENT\r\n";
+        final byte[] turnClientMessageBytes = 
+            turnClientMessage.getBytes("US-ASCII");
+        final SendIndication sendIndication = 
+            new SendIndication(remoteHostAddress, turnClientMessageBytes);
+        write(m_turnClientSocket, sendIndication);
+        // Read the raw data from the remote host socket.
+        final Scanner scanner = 
+            new Scanner(remoteHostSocket.getInputStream());
+        scanner.useDelimiter("\r\n");
+        assertTrue(scanner.hasNext());
+        final String dataOnRemoteHost = scanner.next();
+        assertEquals(turnClientMessage.trim(), dataOnRemoteHost);
         }
 
-    private void verifyDataIndication(final InputStream is,
-        final InetAddress address, final int port) throws Exception
+    private Map<Integer, StunAttribute> readMessage(final Socket socket, 
+        final int expectedMessageType, final int expectedAttributeType, 
+        final int expectedAttributeLength) throws Exception
         {
-        LOG.trace("Verifying Data Indication...\n\n\n");
-        final Socket remoteClient = new Socket(address, port);
-        remoteClient.setSoTimeout(4000);
-        final OutputStream remoteClientStream = remoteClient.getOutputStream();
-        final String helloClient = "hello client.  i love asia";
-
-        LOG.trace("About to write data...");
-        remoteClientStream.write(helloClient.getBytes());
-
-        final ByteBuffer buffer =
-            ByteBuffer.allocate(36 + helloClient.length());
-
-        LOG.trace("About to read data....");
-        while (buffer.hasRemaining())
+        final InputStream is = socket.getInputStream();
+        final ByteBuffer responseHeaderBuffer = ByteBuffer.allocate(20);
+        LOG.debug("Reading response...");
+        // Read the whole header.
+        for (int i = 0; i < 20; i++)
             {
-            buffer.put((byte) is.read());
+            responseHeaderBuffer.put((byte) is.read());
             }
+        
+        responseHeaderBuffer.flip();
+        
+        final int type = responseHeaderBuffer.getUnsignedShort();
+        LOG.debug("Got message type: "+type);
+        assertEquals(expectedMessageType, type);
 
-        buffer.rewind();
-        final short type = buffer.getShort();
-        assertEquals(TurnMessageTypes.DATA_INDICATION, type);
-        final short length = buffer.getShort();
-        final short expectedLength = (short)(4 + helloClient.length() + 12);
-        assertEquals(expectedLength, length);
+        final int messageLength = responseHeaderBuffer.getUnsignedShort();
+        LOG.debug("Got message length: "+messageLength);
+        
 
-        // Just read the transaction ID even though it doesn't matter for
-        // data indication messages.
         final byte[] transactionIdBytes = new byte[16];
-        buffer.get(transactionIdBytes);
-
-        LOG.trace("Reading "+length+" bytes...");
-        LOG.trace("Bytes remaining: "+buffer.remaining());
-
-        assertEquals(TurnAttributeTypes.REMOTE_ADDRESS, buffer.getShort());
-        assertEquals(8, buffer.getShort());
-        assertEquals(0x00, buffer.get());
-        assertEquals(TurnConstants.ADDRESS_FAMILY, buffer.get());
-        assertEquals(remoteClient.getLocalPort(),
-            Unsigned.getUnsignedShort(buffer));
-
-        final byte[] readIpBytes = new byte[4];
-        buffer.get(readIpBytes);
-        final InetAddress readAddress = InetAddress.getByAddress(readIpBytes);
-        assertEquals(address, readAddress);
-
-        assertEquals(TurnAttributeTypes.DATA, buffer.getShort());
-        assertEquals(helloClient.length(), Unsigned.getUnsignedShort(buffer));
-        final byte[] readBytes = new byte[helloClient.length()];
-        buffer.get(readBytes);
-
-        final String readString = new String(readBytes);
-        LOG.trace("read: "+readString);
-        assertEquals(helloClient, readString);
-
+        responseHeaderBuffer.get(transactionIdBytes);
+        
+        // We ignore the transaction ID, since it's tricky for indications.
+        
+        final byte[] bodyBytes = new byte[messageLength];
+        is.read(bodyBytes);
+        
+        final ByteBuffer bodyBuffer = ByteBuffer.wrap(bodyBytes);
+        final StunAttributesFactory attributesFactory = 
+            new StunAttributesFactoryImpl();
+        
+        final Map<Integer, StunAttribute> attributes = 
+            attributesFactory.createAttributes(bodyBuffer); 
+        
+        final StunAttribute attribute =
+            attributes.get(new Integer(expectedAttributeType));
+        assertNotNull("Attribute did not exist", attribute);
+        assertEquals(expectedAttributeLength, attribute.getBodyLength());
+        return attributes;
         }
 
-    private void verifySendResponse(final InputStream is,
-        final SendRequest request) throws Exception
+    private void write(final Socket socket, final String msg) throws Exception
         {
-        LOG.trace("Verifying Send Response...\n\n\n");
-        final ByteBuffer buffer = ByteBuffer.allocate(20);
-        while (buffer.hasRemaining())
-            {
-            buffer.put((byte) is.read());
-            }
-        buffer.rewind();
-        final short type = buffer.getShort();
-        assertEquals(TurnMessageTypes.SEND_RESPONSE, type);
-        final short length = buffer.getShort();
-        assertEquals(0, length);
-
-        final byte[] idBytes = new byte[16];
-        buffer.get(idBytes);
-        final UUID id = new UUID(idBytes);
-        assertEquals(request.getTransactionId(), id);
+        final OutputStream os = socket.getOutputStream();
+        os.write(msg.getBytes("US-ASCII"));
+        os.flush();
         }
 
-    private static final String TEST_STRING = "HTTP TEST";
-
-    /**
-     * This runs a local server that acts as the remote host for receiving
-     * TURN Send Requests.
-     *
-     * @throws Exception If any unexpected error occurs.
-     */
-    private void runThreadedTestServer() throws Exception
+    private void write(final Socket socket, 
+        final StunMessage request) throws Exception
         {
-        final Thread serverThread = new Thread(new Runnable()
-            {
-            public void run()
-                {
-                try
-                    {
-                    runTestServer();
-                    }
-                catch (final Exception e)
-                    {
-                    TurnServerTest.fail("Unexpected exception: "+e);
-                    }
-                }
-            });
-        serverThread.setDaemon(true);
-        serverThread.start();
+        final ByteBuffer buffer = toByteBuffer(request);
+        final OutputStream os = socket.getOutputStream();
+        os.write(MinaUtils.toByteArray(buffer));
+        os.flush();
         }
 
-    private void runTestServer() throws Exception
+    private ByteBuffer toByteBuffer(final StunMessage message)
         {
-        LOG.trace("Running test server on port: "+TEST_SERVER_PORT);
-        final ServerSocket server = new ServerSocket(TEST_SERVER_PORT);
-        LOG.trace("About to notify....");
-        synchronized (this)
-            {
-            LOG.trace("Notifying...");
-            this.m_notified = true;
-            notifyAll();
-            }
-        final Socket client = server.accept();
-        LOG.trace("Received test socket...");
-        client.setSoTimeout(6000);
-        final InputStream is = client.getInputStream();
-        final ByteBuffer buffer = ByteBuffer.allocate(TEST_STRING.length());
-        while (buffer.hasRemaining())
-            {
-            LOG.trace("About to read...");
-            buffer.put((byte) is.read());
-            }
-
-        buffer.rewind();
-        final byte[] httpTestBytes = new byte[9];
-        buffer.get(httpTestBytes);
-
-        final String receivedString = new String(httpTestBytes);
-        LOG.trace("Received string: "+receivedString);
-        assertEquals(TEST_STRING, receivedString);
-
-        this.m_retrievedTestString = true;
-        synchronized (this)
-            {
-            notifyAll();
-            }
+        final StunMessageEncoder encoder = new StunMessageEncoder();
+        return encoder.encode(message);
         }
     }

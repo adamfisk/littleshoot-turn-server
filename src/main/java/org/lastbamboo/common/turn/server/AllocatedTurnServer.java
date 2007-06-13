@@ -1,16 +1,17 @@
 package org.lastbamboo.common.turn.server;
 
 /**
- * Interface for creating a new TURN server.
+ * Interface for a TURN server created in response to a TURN Allocate Request
+ * from a client.
  */
-public interface TurnServer
+public interface AllocatedTurnServer
     {
 
     /**
      * Starts the server.
      */
     void start();
-    
+
     /**
      * Stops the server.
      */
