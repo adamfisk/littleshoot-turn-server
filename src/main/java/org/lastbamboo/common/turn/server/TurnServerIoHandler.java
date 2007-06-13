@@ -28,9 +28,12 @@ public class TurnServerIoHandler extends AbstractStunIoHandler
         {
         SessionUtil.initialize(session);
         
-        // If we haven't heard from the TURN client in awhile, we close the
-        // connection.  Note this is in seconds.
-        session.setIdleTime(IdleStatus.READER_IDLE, 60 * 10);
+        // We consider a connection to be idle if there's been no traffic
+        // in either direction for awhile.  Note that the client should be
+        // periodically updating the connection with allocate requests, but
+        // those might not come for awhile if there's a large file transfer,
+        // for example, so we respect traffic from either direction.
+        session.setIdleTime(IdleStatus.BOTH_IDLE, 60 * 10);
         }
 
     public void sessionIdle(final IoSession session, final IdleStatus status) 

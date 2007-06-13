@@ -24,16 +24,17 @@ import org.slf4j.LoggerFactory;
 /**
  * Default TURN client implementation.  Starts the server on behalf of the
  * TURN client and keeps track of remote hosts that have permission to send
- * incoming data to this client.
+ * incoming data to this client.<p>
  *
  * Note that this class does not implement <code>CloseListener</code> because
  * doing so would require us to keep track of a separate data structure of
  * "cancelled" connections.  Instead, we simply allow the write attempt to
  * throw an <code>IOException</code>, allowing the caller to respond with
- * "Send Error Response" messages to the TURN client as appropriate.
+ * "Send Error Response" messages to the TURN client as appropriate.<p>
  *
  * Note that the lifetime of TURN allocations is handled externally 
- * according to how it's been since we've received data from TURN clients.
+ * according to how the connection has been idle.<p>
+ * 
  * We deviate from the TURN spec here because it just seems to make sense
  * to only close TURN sessions when there's been no data, not after fixed
  * periods regardless of whether there's data or not.
