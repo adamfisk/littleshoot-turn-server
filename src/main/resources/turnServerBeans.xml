@@ -2,65 +2,22 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans>
+
+    <bean id="turnPortGenerator"
+          class="org.lastbamboo.common.stun.stack.turn.RandomNonCollidingPortGeneratorImpl"/>
+          
     <!--
-        The message handler factory class to use for processing TURN messages.
+        The class that keeps track of TURN clients.
     -->
     <bean id="turnClientManager"
           class="org.lastbamboo.common.turn.server.TurnClientManagerImpl">
-        <constructor-arg index="0">
-            <ref bean="selectorManager"/>
-            </constructor-arg>
-        <constructor-arg index="1">
-            <ref bean="turnMessageFactory"/>
-            </constructor-arg>
-        <constructor-arg index="2">
-            <ref bean="turnPortGenerator"/>
-            </constructor-arg>
+        <constructor-arg><ref local="turnPortGenerator"/></constructor-arg>
         </bean>
 
     <!--
-        The message handler factory class to use for processing TURN
-        messages.
-    -->
-    <bean id="turnServerMessageHandlerFactory"
-          class="org.lastbamboo.common.turn.server.ServerTurnMessageHandlerFactory">
-        <property name="turnMessageFactory">
-            <ref bean="turnMessageFactory"/>
-            </property>
-        <property name="attributesReader">
-            <ref bean="turnAttributesReader"/>
-            </property>
-        </bean>
-
-    <!--
-        The object that handles listening for incoming TURN client connections.
-    -->
-    <bean id="turnServerAcceptorListener"
-          class="org.lastbamboo.common.turn.server.TurnServerAcceptorListener">
-        <constructor-arg index="0">
-            <ref bean="selectorManager"/>
-            </constructor-arg>
-        <constructor-arg index="1">
-            <ref bean="turnServerMessageHandlerFactory"/>
-            </constructor-arg>
-        <constructor-arg index="2">
-            <ref bean="turnMessageFactory"/>
-            </constructor-arg>
-        <constructor-arg index="3">
-            <ref bean="turnClientManager"/>
-            </constructor-arg>
-        </bean>
-
-    <!--
-        The TURN server facade.
+        The TURN server.
     -->
     <bean id="turnServer"
-          class="org.lastbamboo.common.turn.server.TurnServerImpl">
-        <constructor-arg index="0">
-            <ref bean="selectorManager"/>
-            </constructor-arg>
-        <constructor-arg index="1">
-            <ref local="turnServerAcceptorListener"/>
-            </constructor-arg>
+          class="org.lastbamboo.common.turn.server.TcpTurnServer">
         </bean>
     </beans>
