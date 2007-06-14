@@ -106,6 +106,8 @@ public class TcpAllocatedTurnServer implements AllocatedTurnServer,
 
     public void sessionCreated(final IoSession session)
         {
+        this.m_turnClient.addConnection(session);
+        /*
         if (this.m_turnClient.hasIncomingPermission(session))
             {
             this.m_turnClient.addConnection(session);
@@ -114,6 +116,7 @@ public class TcpAllocatedTurnServer implements AllocatedTurnServer,
             {
             session.close();
             }
+            */
         }
 
     public void sessionDestroyed(final IoSession session)

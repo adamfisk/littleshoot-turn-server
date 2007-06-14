@@ -205,6 +205,7 @@ public final class TurnClientImpl implements TurnClient
         {
         final InetSocketAddress socketAddress = normalizeSocketAddress(session);
         // Make sure the host has permissions.
+        /*
         if (!hasIncomingPermission(session))
             {
             // This could possibly happen if another thread removed 
@@ -213,6 +214,7 @@ public final class TurnClientImpl implements TurnClient
             session.close();
             }
         else
+        */
             {
             this.m_connections.put(socketAddress, session);
             updateConnectionStatus(socketAddress, ConnectionStatus.ESTABLISHED);
