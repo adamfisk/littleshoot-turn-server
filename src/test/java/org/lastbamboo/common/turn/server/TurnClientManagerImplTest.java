@@ -73,9 +73,10 @@ public final class TurnClientManagerImplTest extends TestCase
 
         // Make sure we can't connect to the allocated address for the TURN
         // client, since it should be closed.
-        connectToServer(client.getAllocatedSocketAddress());
+        // This is disabled for now because we allow all incoming connections.
+        //connectToServer(client.getAllocatedSocketAddress());
 
-        assertEquals(0, removedClient.getNumConnections());
+        //assertEquals(0, removedClient.getNumConnections());
         }
     
     private void connectToServerSuccess(

@@ -22,8 +22,9 @@ import org.lastbamboo.common.stun.stack.message.attributes.StunAttributesFactory
 import org.lastbamboo.common.stun.stack.message.attributes.StunAttributesFactoryImpl;
 import org.lastbamboo.common.stun.stack.message.attributes.turn.DataAttribute;
 import org.lastbamboo.common.stun.stack.message.turn.AllocateRequest;
-import org.lastbamboo.common.stun.stack.message.turn.ConnectRequest;
 import org.lastbamboo.common.stun.stack.message.turn.SendIndication;
+import org.lastbamboo.common.stun.stack.turn.RandomNonCollidingPortGenerator;
+import org.lastbamboo.common.stun.stack.turn.RandomNonCollidingPortGeneratorImpl;
 import org.lastbamboo.common.util.NetworkUtils;
 import org.lastbamboo.common.util.mina.MinaUtils;
 
@@ -88,39 +89,56 @@ public final class TurnServerTest extends TestCase
         // have not sent a Connect Request to it yet...
         LOG.trace("About to start socket for remote client");
         Socket remoteHostSocket = new Socket();
-        remoteHostSocket.connect(allocatedSocketAddress);
-        remoteHostSocket.setSoTimeout(6000);
+        //remoteHostSocket.connect(allocatedSocketAddress);
+        //remoteHostSocket.setSoTimeout(6000);
         
         LOG.trace("Started socket....");
-        final InputStream readStream = remoteHostSocket.getInputStream();
+        //final InputStream readStream = remoteHostSocket.getInputStream();
 
         // Make sure the stream is dead.
-        assertEquals(-1, readStream.read());
-        remoteHostSocket.close();
+        //assertEquals(-1, readStream.read());
+        //remoteHostSocket.close();
         
         // Now send a connect request for that client.  This will just open
         // permissions for the remote host.
-        final InetSocketAddress remoteHostAddress = 
-            new InetSocketAddress("127.0.0.1", 52811);
-        final ConnectRequest connectRequest = 
-            new ConnectRequest(remoteHostAddress);
-        write(m_turnClientSocket, connectRequest);
-        LOG.debug("Wrote connect request");
+        //final InetSocketAddress remoteHostAddress = 
+          //  new InetSocketAddress("127.0.0.1", 52811);
+        //final ConnectRequest connectRequest = 
+          //  new ConnectRequest(remoteHostAddress);
+        //write(m_turnClientSocket, connectRequest);
+        //LOG.debug("Wrote connect request");
         
         // The server will generate a connection status indication in response
         // to the connect request.  Process it!
+        /*
         LOG.debug("Processing connection status...");
         Map<Integer, StunAttribute> messageAttributes = 
             readMessage(m_turnClientSocket, 
                 StunMessageType.CONNECTION_STATUS_INDICATION,
                 StunAttributeType.CONNECT_STAT, 4);
         LOG.debug("Processed connection status");
+        */
         
         // Now the remote host should have permission to connect, so connect it.
-        remoteHostSocket = new Socket();
+        //remoteHostSocket = new Socket();
         // We just store this for future use.  It's the address of the "remote"
         // host.
+        //remoteHostSocket.bind(remoteHostAddress);
+        
+        // We create a random port here because the operating system keeps 
+        // ports bound for a bit even after the socket is closed, leading to
+        // bind failures if the test is run in rapid succession.  This makes
+        // that extremely unlikely.
+        final RandomNonCollidingPortGenerator portGenerator = 
+            new RandomNonCollidingPortGeneratorImpl();
+        final InetSocketAddress remoteHostAddress = 
+            new InetSocketAddress("127.0.0.1", 
+                portGenerator.createRandomPort());
         remoteHostSocket.bind(remoteHostAddress);
+        //final InetSocketAddress remoteHostAddress = 
+          //  (InetSocketAddress) remoteHostSocket.getLocalSocketAddress();
+
+        LOG.debug("Bound to: "+remoteHostAddress);
         remoteHostSocket.connect(allocatedSocketAddress);
         assertTrue(remoteHostSocket.isConnected());
         assertTrue(remoteHostSocket.isBound());
@@ -128,7 +146,7 @@ public final class TurnServerTest extends TestCase
         
         // The server again sends a connect status because the client is now
         // connected!!
-        messageAttributes = readMessage(m_turnClientSocket, 
+        Map<Integer, StunAttribute> messageAttributes = readMessage(m_turnClientSocket, 
             StunMessageType.CONNECTION_STATUS_INDICATION,
             StunAttributeType.CONNECT_STAT, 4);
         

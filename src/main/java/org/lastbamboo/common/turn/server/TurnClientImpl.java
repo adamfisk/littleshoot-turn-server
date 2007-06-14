@@ -113,6 +113,7 @@ public final class TurnClientImpl implements TurnClient
             // has sent a little extra data.
             LOG.debug("Attempting to send data to host that's not there: "+ 
                 remoteAddress);
+            LOG.debug("We have: {}"+this.m_connections);
             return false;
             }
         else
