@@ -1,5 +1,6 @@
 package org.lastbamboo.common.turn.server;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -79,8 +80,12 @@ public final class TurnServerTest extends TestCase
                 StunAttributeType.MAPPED_ADDRESS, 8);
         final MappedAddress ma = (MappedAddress) allocateResponseAttributes.get(
             new Integer(StunAttributeType.MAPPED_ADDRESS));
-        final InetSocketAddress allocatedSocketAddress = 
-            ma.getInetSocketAddress();
+        // Vista seems to have an issue with connecting to local network 
+        // addresses, so we use straight localhost instead and just use the 
+        // allocated port.
+        InetSocketAddress allocatedSocketAddress = 
+            new InetSocketAddress("127.0.0.1", 
+                ma.getInetSocketAddress().getPort());
         // Done reading the allocate response.  We'll use this to connect to
         // the TURN client.
         
@@ -139,7 +144,17 @@ public final class TurnServerTest extends TestCase
           //  (InetSocketAddress) remoteHostSocket.getLocalSocketAddress();
 
         LOG.debug("Bound to: "+remoteHostAddress);
-        remoteHostSocket.connect(allocatedSocketAddress);
+        
+        try
+            {
+            remoteHostSocket.connect(allocatedSocketAddress);
+            }
+        catch (final IOException e) 
+            {
+            LOG.debug("Could not connect", e);
+            fail("could not connect to: "+allocatedSocketAddress+" "+ 
+                e.getMessage());
+            }
         assertTrue(remoteHostSocket.isConnected());
         assertTrue(remoteHostSocket.isBound());
         LOG.debug("Remote host connected successfully!");
