@@ -56,10 +56,12 @@ public final class TurnServerMessageVisitor implements StunMessageVisitor
         final TurnClient client = this.m_turnClientManager.allocateBinding(
             this.m_ioSession);
         
-        final InetSocketAddress address = client.getAllocatedSocketAddress();
+        final InetSocketAddress relayAddress = client.getRelayAddress();
+        final InetSocketAddress mappedAddress = client.getMappedAddress();
         
         final SuccessfulAllocateResponse response =
-            new SuccessfulAllocateResponse(request.getTransactionId(), address); 
+            new SuccessfulAllocateResponse(request.getTransactionId(), 
+                relayAddress, mappedAddress); 
 
         this.m_ioSession.write(response);
         }    

@@ -60,11 +60,11 @@ public final class TurnClientManagerImpl implements TurnClientManager
             final int newPort = this.m_portGenerator.createRandomPort();
             try
                 {
-                final InetSocketAddress allocatedAddress = 
+                final InetSocketAddress relayAddress = 
                     new InetSocketAddress(NetworkUtils.getLocalHost(), newPort);
                 
                 final TurnClient turnClient = 
-                    new TurnClientImpl(allocatedAddress, ioSession);
+                    new TurnClientImpl(relayAddress, ioSession);
                 turnClient.startServer();
                 this.m_clientMappings.put(ioSession, turnClient);
                 
@@ -95,7 +95,7 @@ public final class TurnClientManagerImpl implements TurnClientManager
         if (client != null)
             {
             client.close();
-            final int port = client.getAllocatedSocketAddress().getPort();
+            final int port = client.getRelayAddress().getPort();
             this.m_portGenerator.removePort(port);
             }
         return client;

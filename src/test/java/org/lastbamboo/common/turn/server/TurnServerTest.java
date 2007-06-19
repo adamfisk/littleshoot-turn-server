@@ -16,12 +16,13 @@ import org.apache.mina.common.ByteBuffer;
 import org.lastbamboo.common.stun.stack.encoder.StunMessageEncoder;
 import org.lastbamboo.common.stun.stack.message.StunMessage;
 import org.lastbamboo.common.stun.stack.message.StunMessageType;
-import org.lastbamboo.common.stun.stack.message.attributes.MappedAddress;
+import org.lastbamboo.common.stun.stack.message.attributes.MappedAddressAttribute;
 import org.lastbamboo.common.stun.stack.message.attributes.StunAttribute;
 import org.lastbamboo.common.stun.stack.message.attributes.StunAttributeType;
 import org.lastbamboo.common.stun.stack.message.attributes.StunAttributesFactory;
 import org.lastbamboo.common.stun.stack.message.attributes.StunAttributesFactoryImpl;
 import org.lastbamboo.common.stun.stack.message.attributes.turn.DataAttribute;
+import org.lastbamboo.common.stun.stack.message.attributes.turn.RelayAddressAttribute;
 import org.lastbamboo.common.stun.stack.message.turn.AllocateRequest;
 import org.lastbamboo.common.stun.stack.message.turn.SendIndication;
 import org.lastbamboo.common.stun.stack.turn.RandomNonCollidingPortGenerator;
@@ -78,12 +79,12 @@ public final class TurnServerTest extends TestCase
             readMessage(m_turnClientSocket, 
                 StunMessageType.SUCCESSFUL_ALLOCATE_RESPONSE,
                 StunAttributeType.MAPPED_ADDRESS, 8);
-        final MappedAddress ma = (MappedAddress) allocateResponseAttributes.get(
-            new Integer(StunAttributeType.MAPPED_ADDRESS));
+        final RelayAddressAttribute ma = (RelayAddressAttribute) allocateResponseAttributes.get(
+            new Integer(StunAttributeType.RELAY_ADDRESS));
         // Vista seems to have an issue with connecting to local network 
         // addresses, so we use straight localhost instead and just use the 
         // allocated port.
-        InetSocketAddress allocatedSocketAddress = 
+        InetSocketAddress relaySocketAddress = 
             new InetSocketAddress("127.0.0.1", 
                 ma.getInetSocketAddress().getPort());
         // Done reading the allocate response.  We'll use this to connect to
@@ -147,12 +148,12 @@ public final class TurnServerTest extends TestCase
         
         try
             {
-            remoteHostSocket.connect(allocatedSocketAddress);
+            remoteHostSocket.connect(relaySocketAddress);
             }
         catch (final IOException e) 
             {
             LOG.debug("Could not connect", e);
-            fail("could not connect to: "+allocatedSocketAddress+" "+ 
+            fail("could not connect to: "+relaySocketAddress+" "+ 
                 e.getMessage());
             }
         assertTrue(remoteHostSocket.isConnected());

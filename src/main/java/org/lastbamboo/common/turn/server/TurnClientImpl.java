@@ -48,7 +48,9 @@ public final class TurnClientImpl implements TurnClient
     private static final Logger LOG = 
         LoggerFactory.getLogger(TurnClientImpl.class);
 
-    private final InetSocketAddress m_allocatedAddress;
+    private final InetSocketAddress m_relayAddress;
+    
+    private final InetSocketAddress m_mappedAddress;
 
     /**
      * <code>Map</code> of <code>InetSocketAddress</code>es to handler for
@@ -81,23 +83,28 @@ public final class TurnClientImpl implements TurnClient
     /**
      * Creates a new TURN client abstraction for the specified TURN client
      * address and port.
-     * @param allocatedAddress The address and port this server has allocated
+     * 
+     * @param relayAddress The address and port this server has allocated
      * on behalf of the TURN client.  This is the address and port the client
      * will report as its own address and port when communicating with other
      * clients.
      * @param ioSession The handler for writing data back to the TURN client.
      */
-    public TurnClientImpl(final InetSocketAddress allocatedAddress,
+    public TurnClientImpl(final InetSocketAddress relayAddress,
         final IoSession ioSession)
         {
-        this.m_allocatedAddress = allocatedAddress;
+        this.m_relayAddress = relayAddress;
         this.m_ioSession = ioSession;
+        
+        // The address of the client from the perspective of the server --
+        // the client's public address.
+        this.m_mappedAddress = (InetSocketAddress) ioSession.getRemoteAddress();
         }
 
     public void startServer()
         {
         this.m_allocatedTurnServer = 
-            new TcpAllocatedTurnServer(this, this.m_allocatedAddress.getPort());
+            new TcpAllocatedTurnServer(this, this.m_relayAddress.getPort());
         this.m_allocatedTurnServer.start();
         }
 
@@ -141,9 +148,14 @@ public final class TurnClientImpl implements TurnClient
         updateConnectionStatus(remoteAddress, ConnectionStatus.LISTEN);
         }
 
-    public InetSocketAddress getAllocatedSocketAddress()
+    public InetSocketAddress getRelayAddress()
         {
-        return this.m_allocatedAddress;
+        return this.m_relayAddress;
+        }
+    
+    public InetSocketAddress getMappedAddress()
+        {
+        return this.m_mappedAddress;
         }
 
     public void close()

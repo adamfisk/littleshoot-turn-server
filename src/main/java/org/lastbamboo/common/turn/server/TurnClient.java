@@ -43,7 +43,7 @@ public interface TurnClient
      *
      * @return The IP address and port this server has allocated for the client.
      */
-    InetSocketAddress getAllocatedSocketAddress();
+    InetSocketAddress getRelayAddress();
 
     /**
      * Closes the client and all associated connections.
@@ -113,5 +113,13 @@ public interface TurnClient
      * @param data The received data.
      */
     void onRemoteHostData(InetSocketAddress remoteAddress, byte[] data);
+
+    /**
+     * Accessor for the MAPPED ADDRESS, otherwise known as the server
+     * reflexive address.
+     * 
+     * @return The MAPPED ADDRESS.
+     */
+    InetSocketAddress getMappedAddress();
 
     }

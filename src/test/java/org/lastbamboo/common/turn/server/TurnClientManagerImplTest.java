@@ -64,7 +64,7 @@ public final class TurnClientManagerImplTest extends TestCase
         
         // Make sure we can connect to the allocated address for the TURN
         // client.
-        connectToServerSuccess(client.getAllocatedSocketAddress(), socket);
+        connectToServerSuccess(client.getRelayAddress(), socket);
 
         final TurnClient removedClient = clientManager.removeBinding(session);
 
