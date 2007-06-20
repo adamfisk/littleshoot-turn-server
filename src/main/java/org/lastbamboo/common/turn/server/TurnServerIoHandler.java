@@ -6,6 +6,8 @@ import org.apache.mina.common.IoSession;
 import org.apache.mina.util.SessionUtil;
 import org.lastbamboo.common.stun.stack.AbstractStunIoHandler;
 import org.lastbamboo.common.stun.stack.message.StunMessageVisitorFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link IoHandler} for STUN servers.
@@ -13,6 +15,8 @@ import org.lastbamboo.common.stun.stack.message.StunMessageVisitorFactory;
 public class TurnServerIoHandler extends AbstractStunIoHandler
     {
 
+    private final Logger LOG = LoggerFactory.getLogger(getClass());
+    
     /**
      * Creates a new server IO handler.
      * 
@@ -40,8 +44,15 @@ public class TurnServerIoHandler extends AbstractStunIoHandler
         throws Exception
         {
         // Note closing the session here will create the appropriate event
-        // handlers to clean up all mappings and references.
+        // handlers to clean up all mappings and references. We close idle
+        // sessions because properly implemented clients should be sending
+        // keep alive messages.
         session.close();
         }
 
+    public void exceptionCaught(final IoSession session, final Throwable cause) 
+        throws Exception
+        {
+        LOG.error("Error processing TURN data for session: "+session, cause);
+        }
     }
