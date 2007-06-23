@@ -87,7 +87,7 @@ public final class TurnServerMessageVisitor implements StunMessageVisitor
         
         // This is a non-blocking write to the remote host.
         client.write(remoteAddress, ByteBuffer.wrap(data));
-        LOG.trace("Finished handling Send Request...");
+        LOG.trace("Finished handling Send Indication...");
         }
 
     public void visitConnectRequest(final ConnectRequest request)

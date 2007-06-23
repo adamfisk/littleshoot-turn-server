@@ -3,17 +3,6 @@
 
 <beans>
 
-    <bean id="turnPortGenerator"
-          class="org.lastbamboo.common.stun.stack.turn.RandomNonCollidingPortGeneratorImpl"/>
-          
-    <!--
-        The class that keeps track of TURN clients.
-    -->
-    <bean id="turnClientManager"
-          class="org.lastbamboo.common.turn.server.TurnClientManagerImpl">
-        <constructor-arg><ref local="turnPortGenerator"/></constructor-arg>
-        </bean>
-
     <!--
         The TURN server.
     -->

@@ -16,7 +16,6 @@ import org.apache.mina.common.ByteBuffer;
 import org.lastbamboo.common.stun.stack.encoder.StunMessageEncoder;
 import org.lastbamboo.common.stun.stack.message.StunMessage;
 import org.lastbamboo.common.stun.stack.message.StunMessageType;
-import org.lastbamboo.common.stun.stack.message.attributes.MappedAddressAttribute;
 import org.lastbamboo.common.stun.stack.message.attributes.StunAttribute;
 import org.lastbamboo.common.stun.stack.message.attributes.StunAttributeType;
 import org.lastbamboo.common.stun.stack.message.attributes.StunAttributesFactory;
@@ -51,7 +50,7 @@ public final class TurnServerTest extends TestCase
             {
             return;
             }
-
+        
         m_server = new TcpTurnServer();
         m_server.start();
         Thread.sleep(1000);
@@ -75,12 +74,12 @@ public final class TurnServerTest extends TestCase
         
         write(m_turnClientSocket, allocateRequest);
         
-        Map<Integer, StunAttribute> allocateResponseAttributes = 
+        Map<StunAttributeType, StunAttribute> allocateResponseAttributes = 
             readMessage(m_turnClientSocket, 
                 StunMessageType.SUCCESSFUL_ALLOCATE_RESPONSE,
                 StunAttributeType.MAPPED_ADDRESS, 8);
         final RelayAddressAttribute ma = (RelayAddressAttribute) allocateResponseAttributes.get(
-            new Integer(StunAttributeType.RELAY_ADDRESS));
+            StunAttributeType.RELAY_ADDRESS);
         // Vista seems to have an issue with connecting to local network 
         // addresses, so we use straight localhost instead and just use the 
         // allocated port.
@@ -162,7 +161,8 @@ public final class TurnServerTest extends TestCase
         
         // The server again sends a connect status because the client is now
         // connected!!
-        Map<Integer, StunAttribute> messageAttributes = readMessage(m_turnClientSocket, 
+        Map<StunAttributeType, StunAttribute> messageAttributes = 
+            readMessage(m_turnClientSocket, 
             StunMessageType.CONNECTION_STATUS_INDICATION,
             StunAttributeType.CONNECT_STAT, 4);
         
@@ -177,8 +177,7 @@ public final class TurnServerTest extends TestCase
             StunAttributeType.DATA, remoteHostMessage.length());
         
         final DataAttribute dataAttribute = 
-            (DataAttribute) messageAttributes.get(
-                new Integer(StunAttributeType.DATA));
+            (DataAttribute) messageAttributes.get(StunAttributeType.DATA);
        
         assertEquals(remoteHostMessage, 
             new String(dataAttribute.getData(), "US-ASCII"));
@@ -203,8 +202,10 @@ public final class TurnServerTest extends TestCase
         assertEquals(turnClientMessage.trim(), dataOnRemoteHost);
         }
 
-    private Map<Integer, StunAttribute> readMessage(final Socket socket, 
-        final int expectedMessageType, final int expectedAttributeType, 
+    private Map<StunAttributeType, StunAttribute> readMessage(
+        final Socket socket, 
+        final int expectedMessageType, 
+        final StunAttributeType expectedAttributeType, 
         final int expectedAttributeLength) throws Exception
         {
         final InputStream is = socket.getInputStream();
@@ -238,11 +239,10 @@ public final class TurnServerTest extends TestCase
         final StunAttributesFactory attributesFactory = 
             new StunAttributesFactoryImpl();
         
-        final Map<Integer, StunAttribute> attributes = 
+        final Map<StunAttributeType, StunAttribute> attributes = 
             attributesFactory.createAttributes(bodyBuffer); 
         
-        final StunAttribute attribute =
-            attributes.get(new Integer(expectedAttributeType));
+        final StunAttribute attribute = attributes.get(expectedAttributeType);
         assertNotNull("Attribute did not exist", attribute);
         assertEquals(expectedAttributeLength, attribute.getBodyLength());
         return attributes;
