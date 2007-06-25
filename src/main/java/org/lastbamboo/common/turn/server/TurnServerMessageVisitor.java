@@ -76,7 +76,8 @@ public final class TurnServerMessageVisitor implements StunMessageVisitor
         {
         if (LOG.isDebugEnabled())
             {
-            LOG.debug("Processing send indication: "+indication);
+            LOG.debug("Processing Send Indication with body length: "+
+                indication.getBodyLength());
             }
         final InetSocketAddress remoteAddress = indication.getRemoteAddress();
         
