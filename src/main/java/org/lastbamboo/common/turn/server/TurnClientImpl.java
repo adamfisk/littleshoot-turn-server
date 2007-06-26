@@ -212,6 +212,16 @@ public final class TurnClientImpl implements TurnClient
             connection.close();
             updateConnectionStatus(remoteAddress, ConnectionStatus.CLOSED);
             }
+        else
+            {
+            LOG.warn("Asked to remove connection we don't know about: "+
+                session);
+            }
+        if (LOG.isDebugEnabled())
+            {
+            LOG.debug("Number of connections after removal: " + 
+               this.m_connections.size());
+            }
         }
     
     public void addConnection(final IoSession session) 
