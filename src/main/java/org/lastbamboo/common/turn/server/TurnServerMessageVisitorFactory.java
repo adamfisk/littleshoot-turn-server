@@ -25,7 +25,7 @@ public class TurnServerMessageVisitorFactory implements
         this.m_turnClientManager = clientManager;
         }
 
-    public StunMessageVisitor createVisitor(final IoSession session)
+    public <T> StunMessageVisitor<T> createVisitor(final IoSession session)
         {
         return new TurnServerMessageVisitor(session, this.m_turnClientManager);
         }
