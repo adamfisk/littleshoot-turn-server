@@ -5,16 +5,11 @@ import java.net.InetSocketAddress;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
-import org.lastbamboo.common.stun.stack.message.BindingRequest;
-import org.lastbamboo.common.stun.stack.message.NullStunMessage;
-import org.lastbamboo.common.stun.stack.message.StunMessageVisitor;
-import org.lastbamboo.common.stun.stack.message.SuccessfulBindingResponse;
+import org.lastbamboo.common.stun.stack.message.StunMessageVisitorAdapter;
 import org.lastbamboo.common.stun.stack.message.turn.AllocateRequest;
 import org.lastbamboo.common.stun.stack.message.turn.ConnectRequest;
-import org.lastbamboo.common.stun.stack.message.turn.ConnectionStatusIndication;
-import org.lastbamboo.common.stun.stack.message.turn.DataIndication;
 import org.lastbamboo.common.stun.stack.message.turn.SendIndication;
-import org.lastbamboo.common.stun.stack.message.turn.SuccessfulAllocateResponse;
+import org.lastbamboo.common.stun.stack.message.turn.AllocateSuccessResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +17,8 @@ import org.slf4j.LoggerFactory;
  * Class that responds to TURN requests from a single TURN client.  Each TURN 
  * client is allocated a unique responder for handling all requests.
  */
-public final class TurnServerMessageVisitor implements StunMessageVisitor
+public final class TurnServerMessageVisitor 
+    extends StunMessageVisitorAdapter<Object>
     {
     
     /**
@@ -61,18 +57,13 @@ public final class TurnServerMessageVisitor implements StunMessageVisitor
         final InetSocketAddress relayAddress = client.getRelayAddress();
         final InetSocketAddress mappedAddress = client.getMappedAddress();
         
-        final SuccessfulAllocateResponse response =
-            new SuccessfulAllocateResponse(request.getTransactionId(), 
+        final AllocateSuccessResponse response =
+            new AllocateSuccessResponse(request.getTransactionId(), 
                 relayAddress, mappedAddress); 
 
         this.m_ioSession.write(response);
         return ObjectUtils.NULL;
         }    
-
-    public Object visitBindingRequest(final BindingRequest request)
-        {
-        return ObjectUtils.NULL;
-        }
 
     public Object visitSendIndication(final SendIndication indication)
         {
@@ -102,42 +93,6 @@ public final class TurnServerMessageVisitor implements StunMessageVisitor
         final TurnClient client = 
             this.m_turnClientManager.getTurnClient(this.m_ioSession);
         client.handleConnect(remoteAddress);
-        return ObjectUtils.NULL;
-        }
-    
-    public Object visitDataIndication(final DataIndication dataIndication)
-        {
-        LOG.error("Server should not receive data indication messages...");
-        return ObjectUtils.NULL;
-        }
-
-    public Object visitSuccessfulAllocateResponse(
-        final SuccessfulAllocateResponse response)
-        {
-        LOG.error("The server should not get allocate response messages: " + 
-           response);
-        return ObjectUtils.NULL;
-        }
-
-    public Object visitSuccessfulBindingResponse(
-        final SuccessfulBindingResponse response)
-        {
-        LOG.error("The server should not get binding response messages: " + 
-            response);
-        return ObjectUtils.NULL;
-        }
-
-    public Object visitConnectionStatusIndication(
-        final ConnectionStatusIndication indication)
-        {
-        LOG.error("The server should not get connect status indications: " + 
-            indication);
-        return ObjectUtils.NULL;
-        }
-
-    public Object visitNullMessage(final NullStunMessage message)
-        {
-        LOG.error("Null message on server!!");
         return ObjectUtils.NULL;
         }
     }

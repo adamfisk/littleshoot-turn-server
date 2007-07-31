@@ -76,7 +76,7 @@ public final class TurnServerTest extends TestCase
         
         Map<StunAttributeType, StunAttribute> allocateResponseAttributes = 
             readMessage(m_turnClientSocket, 
-                StunMessageType.SUCCESSFUL_ALLOCATE_RESPONSE,
+                StunMessageType.ALLOCATE_SUCCESS_RESPONSE,
                 StunAttributeType.MAPPED_ADDRESS, 8);
         final RelayAddressAttribute ma = (RelayAddressAttribute) allocateResponseAttributes.get(
             StunAttributeType.RELAY_ADDRESS);
@@ -204,7 +204,7 @@ public final class TurnServerTest extends TestCase
 
     private Map<StunAttributeType, StunAttribute> readMessage(
         final Socket socket, 
-        final int expectedMessageType, 
+        final StunMessageType expectedMessageType, 
         final StunAttributeType expectedAttributeType, 
         final int expectedAttributeLength) throws Exception
         {
@@ -219,7 +219,8 @@ public final class TurnServerTest extends TestCase
         
         responseHeaderBuffer.flip();
         
-        final int type = responseHeaderBuffer.getUnsignedShort();
+        final int typeInt = responseHeaderBuffer.getUnsignedShort();
+        final StunMessageType type = StunMessageType.toType(typeInt);
         LOG.debug("Got message type: "+type);
         assertEquals(expectedMessageType, type);
 

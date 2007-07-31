@@ -4,18 +4,18 @@ import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.util.SessionUtil;
-import org.lastbamboo.common.stun.stack.AbstractStunIoHandler;
+import org.lastbamboo.common.stun.stack.StunIoHandler;
 import org.lastbamboo.common.stun.stack.message.StunMessageVisitorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link IoHandler} for STUN servers.
+ * {@link IoHandler} for TURN STUN servers.
  */
-public class TurnServerIoHandler extends AbstractStunIoHandler
+public class TurnServerIoHandler extends StunIoHandler
     {
 
-    private final Logger LOG = LoggerFactory.getLogger(getClass());
+    private final Logger m_log = LoggerFactory.getLogger(getClass());
     
     /**
      * Creates a new server IO handler.
@@ -48,11 +48,5 @@ public class TurnServerIoHandler extends AbstractStunIoHandler
         // sessions because properly implemented clients should be sending
         // keep alive messages.
         session.close();
-        }
-
-    public void exceptionCaught(final IoSession session, final Throwable cause) 
-        throws Exception
-        {
-        LOG.error("Error processing TURN data for session: "+session, cause);
         }
     }
