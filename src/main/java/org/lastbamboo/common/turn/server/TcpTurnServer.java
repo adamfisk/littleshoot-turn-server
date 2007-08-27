@@ -10,7 +10,7 @@ import org.apache.mina.common.IoServiceListener;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.SimpleByteBufferAllocator;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
-import org.lastbamboo.common.stun.stack.decoder.StunProtocolCodecFactory;
+import org.lastbamboo.common.stun.stack.StunProtocolCodecFactory;
 import org.lastbamboo.common.stun.stack.message.StunMessageVisitorFactory;
 import org.lastbamboo.common.stun.stack.turn.RandomNonCollidingPortGenerator;
 import org.lastbamboo.common.stun.stack.turn.RandomNonCollidingPortGeneratorImpl;
@@ -55,7 +55,8 @@ public class TcpTurnServer implements TurnServer, IoServiceListener
         final IoHandler handler = new TurnServerIoHandler(visitorFactory);
         
         this.m_minaServer = 
-            new MinaTcpServer(codecFactory, this, handler, STUN_PORT);
+            new MinaTcpServer(codecFactory, this, handler, STUN_PORT, 
+                "TCP-TURN-Server");
         }
     
     public void start()
