@@ -9,7 +9,6 @@ import junit.framework.TestCase;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
-import org.lastbamboo.common.stun.stack.turn.RandomNonCollidingPortGeneratorImpl;
 import org.lastbamboo.common.turn.stub.IoSessionStub;
 
 /**
@@ -25,10 +24,8 @@ public final class TurnClientManagerImplTest extends TestCase
      */
     public void testRemoveBinding() throws Exception
         {
-        final RandomNonCollidingPortGeneratorImpl portGenerator =
-            new RandomNonCollidingPortGeneratorImpl();
         final TurnClientManagerImpl clientManager =
-            new TurnClientManagerImpl(portGenerator);
+            new TurnClientManagerImpl();
 
         final InetSocketAddress host =
             new InetSocketAddress("1.1.1.1", 5332);

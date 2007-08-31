@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.mina.common.IoSession;
-import org.lastbamboo.common.stun.stack.turn.RandomNonCollidingPortGenerator;
 import org.lastbamboo.common.util.NetworkUtils;
 
 /**
@@ -29,19 +28,6 @@ public final class TurnClientManagerImpl implements TurnClientManager
      */
     private final Map<IoSession, TurnClient> m_clientMappings = 
         new ConcurrentHashMap<IoSession, TurnClient>();
-
-    private final RandomNonCollidingPortGenerator m_portGenerator;
-    
-    /**
-     * Manager for clients this TURN server is relaying data on behalf of.
-     * 
-     * @param portGenerator Class for generating ports to use for new clients.
-     */
-    public TurnClientManagerImpl( 
-        final RandomNonCollidingPortGenerator portGenerator)
-        {
-        this.m_portGenerator = portGenerator;
-        }
     
     public TurnClient allocateBinding(final IoSession ioSession) 
         {
@@ -57,11 +43,11 @@ public final class TurnClientManagerImpl implements TurnClientManager
         // Otherwise, we need to allocate a new server for the new client.
         else
             {
-            final int newPort = this.m_portGenerator.createRandomPort();
             try
                 {
+                // Allocate an ephemeral port.
                 final InetSocketAddress relayAddress = 
-                    new InetSocketAddress(NetworkUtils.getLocalHost(), newPort);
+                    new InetSocketAddress(NetworkUtils.getLocalHost(), 0);
                 
                 final TurnClient turnClient = 
                     new TurnClientImpl(relayAddress, ioSession);
@@ -74,7 +60,6 @@ public final class TurnClientManagerImpl implements TurnClientManager
                 {
                 // Should never happen.
                 LOG.error("Could not resolve host", e);
-                this.m_portGenerator.removePort(newPort);
                 return null;
                 }
             }
@@ -95,8 +80,6 @@ public final class TurnClientManagerImpl implements TurnClientManager
         if (client != null)
             {
             client.close();
-            final int port = client.getRelayAddress().getPort();
-            this.m_portGenerator.removePort(port);
             }
         return client;
         }

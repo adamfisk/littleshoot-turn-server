@@ -24,8 +24,6 @@ import org.lastbamboo.common.stun.stack.message.attributes.turn.DataAttribute;
 import org.lastbamboo.common.stun.stack.message.attributes.turn.RelayAddressAttribute;
 import org.lastbamboo.common.stun.stack.message.turn.AllocateRequest;
 import org.lastbamboo.common.stun.stack.message.turn.SendIndication;
-import org.lastbamboo.common.stun.stack.turn.RandomNonCollidingPortGenerator;
-import org.lastbamboo.common.stun.stack.turn.RandomNonCollidingPortGeneratorImpl;
 import org.lastbamboo.common.util.NetworkUtils;
 import org.lastbamboo.common.util.mina.MinaUtils;
 
@@ -134,14 +132,9 @@ public final class TurnServerTest extends TestCase
         // ports bound for a bit even after the socket is closed, leading to
         // bind failures if the test is run in rapid succession.  This makes
         // that extremely unlikely.
-        final RandomNonCollidingPortGenerator portGenerator = 
-            new RandomNonCollidingPortGeneratorImpl();
         final InetSocketAddress remoteHostAddress = 
-            new InetSocketAddress("127.0.0.1", 
-                portGenerator.createRandomPort());
+            new InetSocketAddress("127.0.0.1", 0);
         remoteHostSocket.bind(remoteHostAddress);
-        //final InetSocketAddress remoteHostAddress = 
-          //  (InetSocketAddress) remoteHostSocket.getLocalSocketAddress();
 
         LOG.debug("Bound to: "+remoteHostAddress);
         

@@ -12,8 +12,6 @@ import org.apache.mina.common.SimpleByteBufferAllocator;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.lastbamboo.common.stun.stack.StunProtocolCodecFactory;
 import org.lastbamboo.common.stun.stack.message.StunMessageVisitorFactory;
-import org.lastbamboo.common.stun.stack.turn.RandomNonCollidingPortGenerator;
-import org.lastbamboo.common.stun.stack.turn.RandomNonCollidingPortGeneratorImpl;
 import org.lastbamboo.common.util.mina.MinaTcpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,9 +42,7 @@ public class TcpTurnServer implements TurnServer, IoServiceListener
         ByteBuffer.setUseDirectBuffers(false);
         ByteBuffer.setAllocator(new SimpleByteBufferAllocator());
         
-        final RandomNonCollidingPortGenerator portGenerator = 
-            new RandomNonCollidingPortGeneratorImpl();
-        this.m_turnClientManager = new TurnClientManagerImpl(portGenerator);
+        this.m_turnClientManager = new TurnClientManagerImpl();
         final ProtocolCodecFactory codecFactory = 
             new StunProtocolCodecFactory();
         
