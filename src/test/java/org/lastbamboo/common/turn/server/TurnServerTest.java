@@ -10,6 +10,7 @@ import java.util.Scanner;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.mina.common.ByteBuffer;
@@ -53,6 +54,7 @@ public final class TurnServerTest extends TestCase
         m_server.start();
         Thread.sleep(1000);
         m_turnClientSocket = new Socket(NetworkUtils.getLocalHost(), 3478);
+        m_turnClientSocket.setSoTimeout(1000);
         }
     
     protected void tearDown() throws Exception
@@ -72,7 +74,7 @@ public final class TurnServerTest extends TestCase
         
         write(m_turnClientSocket, allocateRequest);
         
-        Map<StunAttributeType, StunAttribute> allocateResponseAttributes = 
+        final Map<StunAttributeType, StunAttribute> allocateResponseAttributes = 
             readMessage(m_turnClientSocket, 
                 StunMessageType.ALLOCATE_SUCCESS_RESPONSE,
                 StunAttributeType.MAPPED_ADDRESS, 8);
@@ -81,9 +83,8 @@ public final class TurnServerTest extends TestCase
         // Vista seems to have an issue with connecting to local network 
         // addresses, so we use straight localhost instead and just use the 
         // allocated port.
-        InetSocketAddress relaySocketAddress = 
-            new InetSocketAddress("127.0.0.1", 
-                ma.getInetSocketAddress().getPort());
+        final InetSocketAddress relaySocketAddress = 
+            ma.getInetSocketAddress();
         // Done reading the allocate response.  We'll use this to connect to
         // the TURN client.
         
@@ -132,19 +133,20 @@ public final class TurnServerTest extends TestCase
         // ports bound for a bit even after the socket is closed, leading to
         // bind failures if the test is run in rapid succession.  This makes
         // that extremely unlikely.
-        final InetSocketAddress remoteHostAddress = 
-            new InetSocketAddress("127.0.0.1", 0);
-        remoteHostSocket.bind(remoteHostAddress);
+        final int port = 1024 + (RandomUtils.nextInt() % 5000);
+        remoteHostSocket.bind(new InetSocketAddress("127.0.0.1", port));
 
+        final InetSocketAddress remoteHostAddress = 
+            (InetSocketAddress) remoteHostSocket.getLocalSocketAddress();
         LOG.debug("Bound to: "+remoteHostAddress);
         
         try
             {
-            remoteHostSocket.connect(relaySocketAddress);
+            remoteHostSocket.connect(relaySocketAddress, 3000);
             }
         catch (final IOException e) 
             {
-            LOG.debug("Could not connect", e);
+            LOG.debug("Could not connect to: "+relaySocketAddress, e);
             fail("could not connect to: "+relaySocketAddress+" "+ 
                 e.getMessage());
             }
@@ -185,6 +187,8 @@ public final class TurnServerTest extends TestCase
             turnClientMessage.getBytes("US-ASCII");
         final SendIndication sendIndication = 
             new SendIndication(remoteHostAddress, turnClientMessageBytes);
+        
+        LOG.debug("About to write...");
         write(m_turnClientSocket, sendIndication);
         // Read the raw data from the remote host socket.
         final Scanner scanner = 

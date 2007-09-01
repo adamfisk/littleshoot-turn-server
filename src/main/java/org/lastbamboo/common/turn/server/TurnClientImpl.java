@@ -104,7 +104,7 @@ public final class TurnClientImpl implements TurnClient
     public void startServer()
         {
         this.m_allocatedTurnServer = 
-            new TcpAllocatedTurnServer(this, this.m_relayAddress.getPort());
+            new TcpAllocatedTurnServer(this, this.m_relayAddress);
         this.m_allocatedTurnServer.start();
         }
 
@@ -150,7 +150,7 @@ public final class TurnClientImpl implements TurnClient
 
     public InetSocketAddress getRelayAddress()
         {
-        return this.m_relayAddress;
+        return this.m_allocatedTurnServer.getSocketAddress();
         }
     
     public InetSocketAddress getMappedAddress()

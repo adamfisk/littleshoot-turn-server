@@ -29,11 +29,13 @@ public class TcpAllocatedTurnServer implements AllocatedTurnServer,
     private final Logger LOG = 
         LoggerFactory.getLogger(TcpAllocatedTurnServer.class);
 
-    private final int m_port;
-
     private final TurnClient m_turnClient;
 
     private final SocketAcceptor m_acceptor;
+
+    private final InetSocketAddress m_socketAddress;
+
+    private InetSocketAddress m_serviceAddress;
     
     /**
      * Creates a new TURN server allocated on behalf of a TURN client.  This
@@ -41,12 +43,13 @@ public class TcpAllocatedTurnServer implements AllocatedTurnServer,
      * client and will relay data on the TURN client's behalf.
      * 
      * @param turnClient The TURN client.
-     * @param port The port to listen on.
+     * @param socketAddress The address to bind to.
      */
-    public TcpAllocatedTurnServer(final TurnClient turnClient, final int port)
+    public TcpAllocatedTurnServer(final TurnClient turnClient, 
+        final InetSocketAddress socketAddress)
         {
         m_turnClient = turnClient;
-        m_port = port;
+        this.m_socketAddress = socketAddress;
         ByteBuffer.setUseDirectBuffers(false);
         ByteBuffer.setAllocator(new SimpleByteBufferAllocator());
         final Executor executor = Executors.newCachedThreadPool();
@@ -71,11 +74,11 @@ public class TcpAllocatedTurnServer implements AllocatedTurnServer,
         final IoHandler handler = 
             new AllocatedTurnServerIoHandler(this.m_turnClient);
         
-        final InetSocketAddress address = new InetSocketAddress(this.m_port);
         try
             {
-            m_acceptor.bind(address, handler);
-            LOG.debug("Started TCP allocated TURN server!!");
+            m_acceptor.bind(this.m_socketAddress, handler);
+            LOG.debug("Started TCP allocated TURN server, binding to: "+
+                this.m_socketAddress);
             }
         catch (final IOException e)
             {
@@ -92,8 +95,8 @@ public class TcpAllocatedTurnServer implements AllocatedTurnServer,
         final SocketAddress serviceAddress, final IoHandler handler, 
         final IoServiceConfig config)
         {
-        // TODO Auto-generated method stub
-        
+        this.m_serviceAddress = (InetSocketAddress)serviceAddress;
+        LOG.debug("Allocated server started on: {}", serviceAddress);
         }
 
     public void serviceDeactivated(final IoService service, 
@@ -123,5 +126,10 @@ public class TcpAllocatedTurnServer implements AllocatedTurnServer,
         {
         LOG.debug("Lost connection to: {}", session);
         this.m_turnClient.removeConnection(session);
+        }
+
+    public InetSocketAddress getSocketAddress()
+        {
+        return this.m_serviceAddress;
         }
     }

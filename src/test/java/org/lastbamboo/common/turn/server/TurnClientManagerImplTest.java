@@ -80,7 +80,7 @@ public final class TurnClientManagerImplTest extends TestCase
         final InetSocketAddress allocatedSocketAddress, final Socket client)
         throws SocketException
         {
-        client.setSoTimeout(1000);
+        client.setSoTimeout(3000);
         try
             {
             client.connect(allocatedSocketAddress);
@@ -90,24 +90,6 @@ public final class TurnClientManagerImplTest extends TestCase
         catch (final IOException e)
             {
             fail("Should have been able to connect to server");
-            }
-        }
-
-    private void connectToServer(final InetSocketAddress allocatedSocketAddress)
-        throws SocketException
-        {
-        final Socket client = new Socket();
-        client.setSoTimeout(1000);
-        try
-            {
-            client.connect(allocatedSocketAddress);
-            assertFalse(client.isBound());
-            assertFalse(client.isConnected());
-            fail("Should not have been able to connect to server");
-            }
-        catch (final IOException e)
-            {
-            // Expected since the server should be closed.
             }
         }
     }

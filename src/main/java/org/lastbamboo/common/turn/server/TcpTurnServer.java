@@ -65,12 +65,11 @@ public class TcpTurnServer implements TurnServer, IoServiceListener
         this.m_minaServer.stop();
         }
 
-    public void serviceActivated(IoService service, 
+    public void serviceActivated(final IoService service, 
         final SocketAddress serviceAddress, final IoHandler handler, 
         final IoServiceConfig config)
         {
-        // TODO Auto-generated method stub
-        
+        LOG.debug("Started server on: "+serviceAddress);
         }
 
     public void serviceDeactivated(final IoService service, 
