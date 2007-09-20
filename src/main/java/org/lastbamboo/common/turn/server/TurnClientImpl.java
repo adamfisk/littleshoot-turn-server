@@ -15,7 +15,6 @@ import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
 import org.lastbamboo.common.stun.stack.message.attributes.turn.ConnectionStatus;
 import org.lastbamboo.common.stun.stack.message.turn.ConnectionStatusIndication;
-import org.lastbamboo.common.stun.stack.message.turn.DataIndication;
 import org.lastbamboo.common.turn.server.allocated.TcpAllocatedTurnServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,7 +117,7 @@ public final class TurnClientImpl implements TurnClient
             // properly informed the TURN client with a connection status
             // message.  This will happen periodically if the TURN client
             // has sent a little extra data.
-            LOG.debug("Attempting to send data to host that's not there: "+ 
+            LOG.debug("Attempting to send data to host that's not there: {}", 
                 remoteAddress);
             LOG.debug("We have: {}"+this.m_connections);
             return false;
@@ -131,17 +130,9 @@ public final class TurnClientImpl implements TurnClient
             }
         }
     
-    public void onRemoteHostData(final InetSocketAddress remoteAddress,
-        final byte[] data)
-        {
-        final DataIndication indication = 
-            new DataIndication(remoteAddress, data);
-        this.m_ioSession.write(indication);
-        }
-    
     public void handleConnect(final InetSocketAddress remoteAddress)
         {
-        LOG.debug("Adding connect permission for: {}  {}", remoteAddress, this);
+        LOG.debug("Adding connect permission for: {} {}", remoteAddress, this);
         final InetAddress address = remoteAddress.getAddress();
         this.m_permittedAddresses.put(address, address);
         this.m_trackedRemoteHosts.add(address);
@@ -183,6 +174,7 @@ public final class TurnClientImpl implements TurnClient
             {
             final IoSession readerWriter = iter.next();
             readerWriter.close();
+            iter.remove();
             }
         }
 

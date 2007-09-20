@@ -28,6 +28,16 @@ public class TurnServerIoHandler extends StunIoHandler
         super(factory);
         }
     
+    @Override
+    public void messageSent(final IoSession session, final Object message)
+        {
+        m_log.debug("TURN server MESSAGES sent for this session: {}",
+            session.getWrittenMessages());
+        m_log.debug("TURN server BYTES sent for this session: {}",
+            session.getWrittenBytes());
+        }
+    
+    @Override
     public void sessionCreated(final IoSession session) throws Exception
         {
         SessionUtil.initialize(session);
@@ -40,8 +50,8 @@ public class TurnServerIoHandler extends StunIoHandler
         session.setIdleTime(IdleStatus.BOTH_IDLE, 60 * 10);
         }
 
+    @Override
     public void sessionIdle(final IoSession session, final IdleStatus status) 
-        throws Exception
         {
         // Note closing the session here will create the appropriate event
         // handlers to clean up all mappings and references. We close idle

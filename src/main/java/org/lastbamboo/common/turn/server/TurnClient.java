@@ -105,15 +105,7 @@ public interface TurnClient
      * for accepting connections from remote hosts.
      */
     void startServer();
-
-    /**
-     * Called when we've received data from a remote host.
-     * 
-     * @param remoteAddress The host the data arrived from.
-     * @param data The received data.
-     */
-    void onRemoteHostData(InetSocketAddress remoteAddress, byte[] data);
-
+    
     /**
      * Accessor for the MAPPED ADDRESS, otherwise known as the server
      * reflexive address.

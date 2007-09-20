@@ -2,7 +2,6 @@ package org.lastbamboo.common.turn.server.allocated;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoFilterAdapter;
@@ -20,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public class TurnRawDataFilter extends IoFilterAdapter
     {
     
-    private final Logger LOG = LoggerFactory.getLogger(getClass());
+    private final Logger m_log = LoggerFactory.getLogger(getClass());
     
     /**
      * This is the limit on the length of the data to encapsulate in a Send
@@ -33,7 +32,7 @@ public class TurnRawDataFilter extends IoFilterAdapter
         final NextFilter nextFilter, final IoSession session, 
         final Object message) throws Exception
         {
-        LOG.debug("Received raw data...");
+        m_log.debug("Received raw data...");
         final InetSocketAddress remoteHost = 
             (InetSocketAddress) session.getRemoteAddress();
         
@@ -50,7 +49,7 @@ public class TurnRawDataFilter extends IoFilterAdapter
      * 
      * @param remoteHost The host the data came from.
      * @param buffer The main read buffer to split.
-     * @param session 
+     * @param session The {@link IoSession} the message arrived on.
      * @param nextFilter The output of the decoder.
      */
     private void sendSplitBuffers(
@@ -60,9 +59,8 @@ public class TurnRawDataFilter extends IoFilterAdapter
         // Break up the data into smaller chunks.
         final Collection<byte[]> buffers = 
             MinaUtils.splitToByteArrays(buffer, LENGTH_LIMIT);
-        for (final Iterator iter = buffers.iterator(); iter.hasNext();)
+        for (final byte[] data : buffers)
             {
-            final byte[] data = (byte[]) iter.next();
             final DataIndication indication =
                 new DataIndication(remoteHost, data);
             nextFilter.messageReceived(session, indication);

@@ -7,6 +7,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import org.apache.mina.common.ByteBuffer;
+import org.apache.mina.common.ExecutorThreadModel;
 import org.apache.mina.common.IoFilter;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoService;
@@ -14,7 +15,9 @@ import org.apache.mina.common.IoServiceConfig;
 import org.apache.mina.common.IoServiceListener;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.SimpleByteBufferAllocator;
+import org.apache.mina.common.ThreadModel;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
+import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
 import org.lastbamboo.common.turn.server.TurnClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +73,13 @@ public class TcpAllocatedTurnServer implements AllocatedTurnServer,
         final IoFilter rawDataFilter = new TurnRawDataFilter();
         m_acceptor.getFilterChain().addLast("to-stun", rawDataFilter);
         
+        final SocketAcceptorConfig config = new SocketAcceptorConfig();
+        final ThreadModel threadModel = 
+            ExecutorThreadModel.getInstance("TCP-TURN-Allocated-Server");
+        //config.setThreadModel(threadModel);
+        config.setThreadModel(ThreadModel.MANUAL);
+        m_acceptor.setDefaultConfig(config);
+    
         // The IO handler just processes the Data Indication messages.
         final IoHandler handler = 
             new AllocatedTurnServerIoHandler(this.m_turnClient);

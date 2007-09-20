@@ -2,14 +2,14 @@ package org.lastbamboo.common.turn.server;
 
 import java.net.InetSocketAddress;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
+import org.lastbamboo.common.stun.stack.message.StunMessage;
 import org.lastbamboo.common.stun.stack.message.StunMessageVisitorAdapter;
 import org.lastbamboo.common.stun.stack.message.turn.AllocateRequest;
+import org.lastbamboo.common.stun.stack.message.turn.AllocateSuccessResponse;
 import org.lastbamboo.common.stun.stack.message.turn.ConnectRequest;
 import org.lastbamboo.common.stun.stack.message.turn.SendIndication;
-import org.lastbamboo.common.stun.stack.message.turn.AllocateSuccessResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * client is allocated a unique responder for handling all requests.
  */
 public final class TurnServerMessageVisitor 
-    extends StunMessageVisitorAdapter<Object>
+    extends StunMessageVisitorAdapter<StunMessage>
     {
     
     /**
@@ -44,7 +44,7 @@ public final class TurnServerMessageVisitor
         this.m_turnClientManager = clientManager;
         }
 
-    public Object visitAllocateRequest(final AllocateRequest request)
+    public StunMessage visitAllocateRequest(final AllocateRequest request)
         {
         LOG.debug("Processing allocate request...");
         
@@ -62,10 +62,10 @@ public final class TurnServerMessageVisitor
                 relayAddress, mappedAddress); 
 
         this.m_ioSession.write(response);
-        return ObjectUtils.NULL;
+        return null;
         }    
 
-    public Object visitSendIndication(final SendIndication indication)
+    public StunMessage visitSendIndication(final SendIndication indication)
         {
         if (LOG.isDebugEnabled())
             {
@@ -82,10 +82,10 @@ public final class TurnServerMessageVisitor
         // This is a non-blocking write to the remote host.
         client.write(remoteAddress, ByteBuffer.wrap(data));
         LOG.trace("Finished handling Send Indication...");
-        return ObjectUtils.NULL;
+        return null;
         }
 
-    public Object visitConnectRequest(final ConnectRequest request)
+    public StunMessage visitConnectRequest(final ConnectRequest request)
         {
         LOG.debug("Processing connect request for: {}", 
             request.getRemoteAddress());
@@ -93,6 +93,6 @@ public final class TurnServerMessageVisitor
         final TurnClient client = 
             this.m_turnClientManager.getTurnClient(this.m_ioSession);
         client.handleConnect(remoteAddress);
-        return ObjectUtils.NULL;
+        return null;
         }
     }

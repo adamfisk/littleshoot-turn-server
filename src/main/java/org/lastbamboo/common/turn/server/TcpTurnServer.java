@@ -22,11 +22,11 @@ import org.slf4j.LoggerFactory;
 public class TcpTurnServer implements TurnServer, IoServiceListener
     {
 
-    private final Logger LOG = LoggerFactory.getLogger(TcpTurnServer.class);
+    private final Logger m_log = LoggerFactory.getLogger(TcpTurnServer.class);
     
     private final TurnClientManagerImpl m_turnClientManager;
 
-    private MinaTcpServer m_minaServer;
+    private final MinaTcpServer m_minaServer;
     
     /**
      * Use the default STUN port.
@@ -69,28 +69,25 @@ public class TcpTurnServer implements TurnServer, IoServiceListener
         final SocketAddress serviceAddress, final IoHandler handler, 
         final IoServiceConfig config)
         {
-        LOG.debug("Started server on: "+serviceAddress);
+        m_log.debug("Started server on: "+serviceAddress);
         }
 
     public void serviceDeactivated(final IoService service, 
         final SocketAddress serviceAddress, final IoHandler handler, 
         final IoServiceConfig config)
         {
-        // TODO Auto-generated method stub
-        
+        m_log.warn("TURN Server deactivated!!");
         }
 
     public void sessionCreated(final IoSession session)
         {
-        // TODO Auto-generated method stub
-        
         }
 
     public void sessionDestroyed(final IoSession session)
         {
         // Key -- we need to tell the client manager the session with the
         // TURN client has closed.
-        LOG.debug("TURN client disconnected: "+session);
+        m_log.debug("TURN client disconnected: "+session);
         this.m_turnClientManager.removeBinding(session);
         }
 
