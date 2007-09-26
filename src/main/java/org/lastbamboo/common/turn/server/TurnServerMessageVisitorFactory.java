@@ -30,4 +30,9 @@ public class TurnServerMessageVisitorFactory implements
         return new TurnServerMessageVisitor(session, this.m_turnClientManager);
         }
 
+    public StunMessageVisitor createVisitor(IoSession session, Object attachment)
+        {
+        return createVisitor(session);
+        }
+
     }

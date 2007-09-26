@@ -51,13 +51,13 @@ public class TcpTurnServer implements TurnServer, IoServiceListener
         final IoHandler handler = new TurnServerIoHandler(visitorFactory);
         
         this.m_minaServer = 
-            new MinaTcpServer(codecFactory, this, handler, STUN_PORT, 
+            new MinaTcpServer(codecFactory, this, handler, 
                 "TCP-TURN-Server");
         }
     
     public void start()
         {
-        this.m_minaServer.start();
+        this.m_minaServer.start(STUN_PORT);
         }
     
     public void stop()
