@@ -76,8 +76,8 @@ public class TcpAllocatedTurnServer implements AllocatedTurnServer,
         final SocketAcceptorConfig config = new SocketAcceptorConfig();
         final ThreadModel threadModel = 
             ExecutorThreadModel.getInstance("TCP-TURN-Allocated-Server");
-        //config.setThreadModel(threadModel);
-        config.setThreadModel(ThreadModel.MANUAL);
+        config.setThreadModel(threadModel);
+        //config.setThreadModel(ThreadModel.MANUAL);
         m_acceptor.setDefaultConfig(config);
     
         // The IO handler just processes the Data Indication messages.

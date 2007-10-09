@@ -28,6 +28,10 @@ public class TurnRawDataFilter extends IoFilterAdapter
      */
     private static final int LENGTH_LIMIT = 0xffff - 1000;
     
+    public TurnRawDataFilter()
+        {
+        
+        }
     public void messageReceived(
         final NextFilter nextFilter, final IoSession session, 
         final Object message) throws Exception
