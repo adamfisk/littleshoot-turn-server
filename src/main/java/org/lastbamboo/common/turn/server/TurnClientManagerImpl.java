@@ -90,6 +90,7 @@ public final class TurnClientManagerImpl implements TurnClientManager
                 LOG.debug("Successfully wrote request...");
                 }
             final String host = method.getResponseBodyAsString();
+            LOG.debug("Got address: "+host);
             return InetAddress.getByName(host);
             }
         catch (final HttpException e)
