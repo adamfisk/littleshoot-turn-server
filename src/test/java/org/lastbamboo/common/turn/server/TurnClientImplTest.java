@@ -23,12 +23,9 @@ public final class TurnClientImplTest extends TestCase
      */
     public void testCloseHandling() throws Exception
         {
-        final InetSocketAddress allocatedAddress =
-            new InetSocketAddress(NetworkUtils.getLocalHost(), 4859);
-       
         final IoSession readerWriter = new IoSessionStub();
         final TurnClientImpl turnClient = 
-            new TurnClientImpl(allocatedAddress, readerWriter);
+            new TurnClientImpl(NetworkUtils.getLocalHost(), readerWriter);
         
         final InetSocketAddress remoteHostAddress = 
             new InetSocketAddress(NetworkUtils.getLocalHost(), 5342);

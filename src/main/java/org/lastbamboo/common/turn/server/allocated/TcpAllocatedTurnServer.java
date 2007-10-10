@@ -1,6 +1,7 @@
 package org.lastbamboo.common.turn.server.allocated;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.Executor;
@@ -19,6 +20,7 @@ import org.apache.mina.common.ThreadModel;
 import org.apache.mina.transport.socket.nio.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
 import org.lastbamboo.common.turn.server.TurnClient;
+import org.lastbamboo.common.util.NetworkUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +38,7 @@ public class TcpAllocatedTurnServer implements AllocatedTurnServer,
 
     private final SocketAcceptor m_acceptor;
 
-    private final InetSocketAddress m_socketAddress;
+    private final InetAddress m_publicAddress;
 
     private InetSocketAddress m_serviceAddress;
     
@@ -46,13 +48,13 @@ public class TcpAllocatedTurnServer implements AllocatedTurnServer,
      * client and will relay data on the TURN client's behalf.
      * 
      * @param turnClient The TURN client.
-     * @param socketAddress The address to bind to.
+     * @param publicAddress The address to bind to.
      */
     public TcpAllocatedTurnServer(final TurnClient turnClient, 
-        final InetSocketAddress socketAddress)
+        final InetAddress publicAddress)
         {
         m_turnClient = turnClient;
-        this.m_socketAddress = socketAddress;
+        this.m_publicAddress = publicAddress;
         ByteBuffer.setUseDirectBuffers(false);
         ByteBuffer.setAllocator(new SimpleByteBufferAllocator());
         final Executor executor = Executors.newCachedThreadPool();
@@ -77,7 +79,6 @@ public class TcpAllocatedTurnServer implements AllocatedTurnServer,
         final ThreadModel threadModel = 
             ExecutorThreadModel.getInstance("TCP-TURN-Allocated-Server");
         config.setThreadModel(threadModel);
-        //config.setThreadModel(ThreadModel.MANUAL);
         m_acceptor.setDefaultConfig(config);
     
         // The IO handler just processes the Data Indication messages.
@@ -86,9 +87,11 @@ public class TcpAllocatedTurnServer implements AllocatedTurnServer,
         
         try
             {
-            m_acceptor.bind(this.m_socketAddress, handler);
+            final InetSocketAddress bindAddress = 
+                new InetSocketAddress(NetworkUtils.getLocalHost(), 0);
+            m_acceptor.bind(bindAddress, handler);
             LOG.debug("Started TCP allocated TURN server, binding to: "+
-                this.m_socketAddress);
+                this.m_publicAddress);
             }
         catch (final IOException e)
             {
@@ -105,7 +108,9 @@ public class TcpAllocatedTurnServer implements AllocatedTurnServer,
         final SocketAddress serviceAddress, final IoHandler handler, 
         final IoServiceConfig config)
         {
-        this.m_serviceAddress = (InetSocketAddress)serviceAddress;
+        final InetSocketAddress isa = (InetSocketAddress) serviceAddress;
+        this.m_serviceAddress = 
+            new InetSocketAddress(this.m_publicAddress, isa.getPort());
         LOG.debug("Allocated server started on: {}", serviceAddress);
         }
 

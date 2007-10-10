@@ -47,7 +47,7 @@ public final class TurnClientImpl implements TurnClient
     private static final Logger LOG = 
         LoggerFactory.getLogger(TurnClientImpl.class);
 
-    private final InetSocketAddress m_relayAddress;
+    private final InetAddress m_publicAddress;
     
     private final InetSocketAddress m_mappedAddress;
 
@@ -89,10 +89,10 @@ public final class TurnClientImpl implements TurnClient
      * clients.
      * @param ioSession The handler for writing data back to the TURN client.
      */
-    public TurnClientImpl(final InetSocketAddress relayAddress,
+    public TurnClientImpl(final InetAddress relayAddress,
         final IoSession ioSession)
         {
-        this.m_relayAddress = relayAddress;
+        this.m_publicAddress = relayAddress;
         this.m_ioSession = ioSession;
         
         // The address of the client from the perspective of the server --
@@ -103,7 +103,7 @@ public final class TurnClientImpl implements TurnClient
     public void startServer()
         {
         this.m_allocatedTurnServer = 
-            new TcpAllocatedTurnServer(this, this.m_relayAddress);
+            new TcpAllocatedTurnServer(this, this.m_publicAddress);
         this.m_allocatedTurnServer.start();
         }
 

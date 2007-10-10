@@ -10,6 +10,8 @@ import junit.framework.TestCase;
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
 import org.lastbamboo.common.turn.stub.IoSessionStub;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests the class for managing TURN clients.
@@ -17,6 +19,8 @@ import org.lastbamboo.common.turn.stub.IoSessionStub;
 public final class TurnClientManagerImplTest extends TestCase
     {
 
+    private final Logger m_log = LoggerFactory.getLogger(getClass());
+    
     /**
      * Tests the class for removing bindings to TURN cleints.
      *
@@ -24,9 +28,8 @@ public final class TurnClientManagerImplTest extends TestCase
      */
     public void testRemoveBinding() throws Exception
         {
-        final TurnClientManagerImpl clientManager =
-            new TurnClientManagerImpl();
-
+        final TurnClientManagerImpl clientManager = new TurnClientManagerImpl();
+        
         final InetSocketAddress host =
             new InetSocketAddress("1.1.1.1", 5332);
         final IoSession session = new IoSessionStub(host); 
