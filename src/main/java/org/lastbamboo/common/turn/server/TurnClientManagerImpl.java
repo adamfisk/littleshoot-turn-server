@@ -2,7 +2,6 @@ package org.lastbamboo.common.turn.server;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,12 +49,14 @@ public final class TurnClientManagerImpl implements TurnClientManager
         {
         // First just check if we're even on Amazon -- we could be testing
         // locally, for example.
+        LOG.debug("Getting public address");
         try
             {
             final InetAddress amazonAddress = 
                 InetAddress.getByName("169.254.169.254");
-            if (!amazonAddress.isReachable(600))
+            if (!amazonAddress.isReachable(1000))
                 {
+                LOG.warn("Address not reachable.  Testing?");
                 return null;
                 }
             }
@@ -74,7 +75,7 @@ public final class TurnClientManagerImpl implements TurnClientManager
         final GetMethod method = new GetMethod(url);
         try
             {
-            LOG.debug("Exectuting method...");
+            LOG.debug("Executing method...");
             final int statusCode = client.executeMethod(method);
             if (statusCode != HttpStatus.SC_OK)
                 {

@@ -83,16 +83,14 @@ public final class TurnClientImpl implements TurnClient
      * Creates a new TURN client abstraction for the specified TURN client
      * address and port.
      * 
-     * @param relayAddress The address and port this server has allocated
-     * on behalf of the TURN client.  This is the address and port the client
-     * will report as its own address and port when communicating with other
-     * clients.
+     * @param publicAddress The public address of the server.  The port will
+     * be determined later using an ephemeral port when we bind.
      * @param ioSession The handler for writing data back to the TURN client.
      */
-    public TurnClientImpl(final InetAddress relayAddress,
+    public TurnClientImpl(final InetAddress publicAddress,
         final IoSession ioSession)
         {
-        this.m_publicAddress = relayAddress;
+        this.m_publicAddress = publicAddress;
         this.m_ioSession = ioSession;
         
         // The address of the client from the perspective of the server --
