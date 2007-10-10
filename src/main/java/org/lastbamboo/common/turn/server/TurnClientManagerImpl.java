@@ -50,6 +50,7 @@ public final class TurnClientManagerImpl implements TurnClientManager
         // First just check if we're even on Amazon -- we could be testing
         // locally, for example.
         LOG.debug("Getting public address");
+        /*
         try
             {
             final InetAddress amazonAddress = 
@@ -70,6 +71,7 @@ public final class TurnClientManagerImpl implements TurnClientManager
             LOG.error("Could not access Amazon service", e);
             return null;
             }
+            */
         final String url = "http://169.254.169.254/latest/meta-data/local-ipv4";
         final HttpClient client = new HttpClient();
         final GetMethod method = new GetMethod(url);
