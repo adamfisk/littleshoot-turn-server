@@ -112,6 +112,7 @@ public class TcpAllocatedTurnServer implements AllocatedTurnServer,
         this.m_serviceAddress = 
             new InetSocketAddress(this.m_publicAddress, isa.getPort());
         LOG.debug("Allocated server started on: {}", serviceAddress);
+        LOG.debug("Using public address: {}", this.m_serviceAddress);
         }
 
     public void serviceDeactivated(final IoService service, 
