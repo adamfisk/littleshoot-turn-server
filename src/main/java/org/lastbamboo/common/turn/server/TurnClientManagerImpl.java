@@ -73,6 +73,8 @@ public final class TurnClientManagerImpl implements TurnClientManager
             */
         final String url = "http://169.254.169.254/latest/meta-data/public-ipv4";
         final HttpClient client = new HttpClient();
+        client.getHttpConnectionManager().getParams().setConnectionTimeout(
+            10 * 1000);
         final GetMethod method = new GetMethod(url);
         try
             {
