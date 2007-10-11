@@ -2,7 +2,6 @@ package org.lastbamboo.common.turn.server;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -72,7 +71,7 @@ public final class TurnClientManagerImpl implements TurnClientManager
             return null;
             }
             */
-        final String url = "http://169.254.169.254/latest/meta-data/local-ipv4";
+        final String url = "http://169.254.169.254/latest/meta-data/public-ipv4";
         final HttpClient client = new HttpClient();
         final GetMethod method = new GetMethod(url);
         try
