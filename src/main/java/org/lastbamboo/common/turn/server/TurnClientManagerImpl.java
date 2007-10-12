@@ -2,6 +2,7 @@ package org.lastbamboo.common.turn.server;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,6 +13,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.mina.common.IoSession;
+import org.lastbamboo.common.util.NetworkUtils;
 
 /**
  * Manages endpoint bindings for TURN clients.  This includes allocating
@@ -49,28 +51,24 @@ public final class TurnClientManagerImpl implements TurnClientManager
         // First just check if we're even on Amazon -- we could be testing
         // locally, for example.
         LOG.debug("Getting public address");
-        /*
+        
+        // Check to see if we're running on EC2.  If we're not, we're probably 
+        // testing.  This technique could be a problem if the EC2 internal 
+        // addressing is ever different from 10.253.
         try
             {
-            final InetAddress amazonAddress = 
-                InetAddress.getByName("169.254.169.254");
-            if (!amazonAddress.isReachable(1000))
+            if (!NetworkUtils.getLocalHost().getHostAddress().startsWith("10.253"))
                 {
-                LOG.warn("Address not reachable.  Testing?");
-                return null;
+                // Not running on EC2.
+                LOG.debug("Not running on EC2.  Testing??");
+                return NetworkUtils.getLocalHost();
                 }
             }
         catch (final UnknownHostException e)
             {
-            LOG.error("Could not access host", e);
+            LOG.error("Could not get host.", e);
             return null;
             }
-        catch (final IOException e)
-            {
-            LOG.error("Could not access Amazon service", e);
-            return null;
-            }
-            */
         final String url = "http://169.254.169.254/latest/meta-data/public-ipv4";
         final HttpClient client = new HttpClient();
         client.getHttpConnectionManager().getParams().setConnectionTimeout(
