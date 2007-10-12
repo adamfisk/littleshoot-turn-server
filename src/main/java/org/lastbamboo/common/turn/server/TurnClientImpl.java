@@ -2,7 +2,6 @@ package org.lastbamboo.common.turn.server;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -190,7 +189,8 @@ public final class TurnClientImpl implements TurnClient
     public void removeConnection(final IoSession session)
         {
         LOG.debug("Removing connection to: {}", session);
-        final InetSocketAddress remoteAddress = normalizeSocketAddress(session);
+        final InetSocketAddress remoteAddress = 
+            (InetSocketAddress) session.getRemoteAddress();
         final IoSession connection = this.m_connections.remove(remoteAddress);
 
         // The connection can be null if a host attempted to connect that 
@@ -216,7 +216,8 @@ public final class TurnClientImpl implements TurnClient
     
     public void addConnection(final IoSession session) 
         {
-        final InetSocketAddress socketAddress = normalizeSocketAddress(session);
+        final InetSocketAddress socketAddress = 
+            (InetSocketAddress) session.getRemoteAddress();
         // Make sure the host has permissions.
         /*
         if (!hasIncomingPermission(session))
@@ -249,31 +250,14 @@ public final class TurnClientImpl implements TurnClient
     public boolean hasIncomingPermission(final IoSession session)
         {
         LOG.debug("Checking permissions for: {}", session);
-        final InetSocketAddress socketAddress = normalizeSocketAddress(session);
+        final InetSocketAddress socketAddress = 
+            (InetSocketAddress) session.getRemoteAddress();
         
         final boolean hasPermission = 
             m_trackedRemoteHosts.contains(socketAddress.getAddress());
         LOG.debug("{} returning permission: {}", this, 
             new Boolean(hasPermission));
         return hasPermission;
-        }
-
-    /**
-     * This method takes the {@link SocketAddress} from the session and 
-     * normalizes it.  This is necessary because {@link InetSocketAddress}es
-     * can contain textual information in addition to the IP address and port.
-     * This information may or may not be present depending on where the
-     * information came from, requiring it to be normalized so that socket
-     * addresses match as {@link Map} keyps.
-     * 
-     * @param session The session containing the {@link InetSocketAddress} to
-     * normalize.
-     * 
-     * @return The normalized {@link InetSocketAddress}.
-     */
-    private InetSocketAddress normalizeSocketAddress(final IoSession session)
-        {
-        return (InetSocketAddress) session.getRemoteAddress();
         }
 
     /**
