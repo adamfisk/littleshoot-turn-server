@@ -204,8 +204,8 @@ public final class TurnClientImpl implements TurnClient
             }
         else
             {
-            LOG.warn("Asked to remove connection we don't know about: "+
-                session);
+            LOG.warn("Asked to remove connection we don't know about:\n"+
+                session + " not in:\n"+this.m_connections);
             }
         if (LOG.isDebugEnabled())
             {
