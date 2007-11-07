@@ -90,8 +90,8 @@ public class TcpAllocatedTurnServer implements AllocatedTurnServer,
             final InetSocketAddress bindAddress = 
                 new InetSocketAddress(NetworkUtils.getLocalHost(), 0);
             m_acceptor.bind(bindAddress, handler);
-            LOG.debug("Started TCP allocated TURN server, binding to: "+
-                this.m_publicAddress);
+            LOG.debug("Started TCP allocated TURN server, bound to: "+
+                bindAddress);
             }
         catch (final IOException e)
             {
