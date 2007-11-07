@@ -28,6 +28,11 @@
 
         <dependency>
             <groupId>org.lastbamboo</groupId>
+            <artifactId>lastbamboo-common-amazon-ec2</artifactId>
+            </dependency>
+
+        <dependency>
+            <groupId>org.lastbamboo</groupId>
             <artifactId>lastbamboo-common-stun-stack</artifactId>
             </dependency>
 
