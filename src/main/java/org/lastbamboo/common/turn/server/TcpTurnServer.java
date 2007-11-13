@@ -24,7 +24,7 @@ public class TcpTurnServer implements TurnServer, IoServiceListener
 
     private final Logger m_log = LoggerFactory.getLogger(TcpTurnServer.class);
     
-    private final TurnClientManagerImpl m_turnClientManager;
+    private final TurnClientManager m_turnClientManager;
 
     private final MinaTcpServer m_minaServer;
     
@@ -32,17 +32,27 @@ public class TcpTurnServer implements TurnServer, IoServiceListener
      * Use the default STUN port.
      */
     private static final int STUN_PORT = 3478;
-
+    
     /**
      * Creates a new TCP TURN server.
      */
     public TcpTurnServer()
         {
+        this (new TurnClientManagerImpl());
+        }
+    
+    /**
+     * Creates a new TCP TURN server.
+     * 
+     * @param turnClientManager The class that manages TURN clients.
+     */
+    public TcpTurnServer(final TurnClientManager turnClientManager)
+        {
         // Configure the MINA buffers for optimal performance.
         ByteBuffer.setUseDirectBuffers(false);
         ByteBuffer.setAllocator(new SimpleByteBufferAllocator());
         
-        this.m_turnClientManager = new TurnClientManagerImpl();
+        this.m_turnClientManager = turnClientManager;
         final ProtocolCodecFactory codecFactory = 
             new StunProtocolCodecFactory();
         

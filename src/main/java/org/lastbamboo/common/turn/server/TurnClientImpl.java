@@ -51,7 +51,7 @@ public final class TurnClientImpl implements TurnClient
     private final InetSocketAddress m_mappedAddress;
 
     /**
-     * <code>Map</code> of <code>InetSocketAddress</code>es to handler for
+     * <code>Map</code> of <code>InetSocketAddress</code>es to handlers for
      * writing to those connections.
      */
     private final Map<InetSocketAddress, IoSession> m_connections = 

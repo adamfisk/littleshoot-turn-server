@@ -6,7 +6,15 @@
     <!--
         The TURN server.
     -->
+    <bean id="turnClientManager"
+          class="org.lastbamboo.common.turn.server.TurnClientManagerImpl">
+        </bean>
+
+    <!--
+        The TURN server.
+    -->
     <bean id="turnServer"
           class="org.lastbamboo.common.turn.server.TcpTurnServer">
+        <constructor-arg ref="turnClientManager"/>
         </bean>
     </beans>

@@ -1,26 +1,20 @@
 package org.lastbamboo.common.turn.server;
 
-import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.mina.common.IoSession;
-import org.lastbamboo.common.amazon.ec2.AmazonEc2Utils;
-import org.lastbamboo.common.util.NetworkUtils;
+import org.lastbamboo.common.amazon.ec2.AmazonEc2UtilsImpl;
 
 /**
  * Manages endpoint bindings for TURN clients.  This includes allocating
  * bindings, timing out bindings, etc.
  */
-public final class TurnClientManagerImpl implements TurnClientManager
+public final class TurnClientManagerImpl implements TurnClientManager,
+    TurnClientManagerImplMBean
     {
     
     /**
@@ -30,7 +24,9 @@ public final class TurnClientManagerImpl implements TurnClientManager
         LogFactory.getLog(TurnClientManagerImpl.class);
     
     /**
-     * Map of <code>InetSocketAddress</code>es to TURN clients. 
+     * Map of {@link IoSession}s to TURN clients.  Each {@link IoSession}
+     * represents a connection over which a client has issued an Allocate
+     * Request method. 
      */
     private final Map<IoSession, TurnClient> m_clientMappings = 
         new ConcurrentHashMap<IoSession, TurnClient>();
@@ -44,7 +40,7 @@ public final class TurnClientManagerImpl implements TurnClientManager
         {
         // We need to determine the public address of the EC2 server -- we need
         // to give this to clients when allocating relays.
-        m_publicAddress = AmazonEc2Utils.getPublicAddress();
+        m_publicAddress = new AmazonEc2UtilsImpl().getPublicAddress();
         }
     
 
@@ -90,5 +86,11 @@ public final class TurnClientManagerImpl implements TurnClientManager
             client.close();
             }
         return client;
+        }
+
+
+    public int getNumClients()
+        {
+        return this.m_clientMappings.size();
         }
     }
