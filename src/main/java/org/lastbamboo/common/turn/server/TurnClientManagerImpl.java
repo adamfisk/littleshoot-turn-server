@@ -7,7 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.mina.common.IoSession;
-import org.lastbamboo.common.amazon.ec2.AmazonEc2UtilsImpl;
+import org.lastbamboo.common.amazon.ec2.AmazonEc2CandidateProvider;
+import org.lastbamboo.common.amazon.ec2.AmazonEc2Utils;
 
 /**
  * Manages endpoint bindings for TURN clients.  This includes allocating
@@ -40,7 +41,7 @@ public final class TurnClientManagerImpl implements TurnClientManager,
         {
         // We need to determine the public address of the EC2 server -- we need
         // to give this to clients when allocating relays.
-        m_publicAddress = new AmazonEc2UtilsImpl().getPublicAddress();
+        m_publicAddress = AmazonEc2Utils.getPublicAddress();
         }
     
 
