@@ -46,4 +46,36 @@
             <artifactId>spring-mock</artifactId>
             </dependency>
         </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.lastbamboo</groupId>
+                <artifactId>lastbamboo-maven-plugin</artifactId>
+                <configuration>
+                    <bundleName>LittleShoot</bundleName>
+                    <javaArgs>
+                        <param>-server</param>
+                        </javaArgs>
+                    <mainClass>
+                        org.lastbamboo.common.turn.server.TurnLauncher
+                        </mainClass>
+                    <javaSystemProps>
+                        <property>
+                            <name>com.sun.management.jmxremote.port</name>
+                            <value>8191</value>
+                            </property>
+                        <property>
+                            <name>com.sun.management.jmxremote.authenticate</name>
+                            <value>false</value>
+                            </property>
+                        <property>
+                            <name>com.sun.management.jmxremote.ssl</name>
+                            <value>false</value>
+                            </property>
+                        </javaSystemProps>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
     </project>

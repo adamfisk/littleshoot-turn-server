@@ -1,14 +1,14 @@
 package org.lastbamboo.common.turn.server;
 
 import java.net.InetAddress;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.mina.common.IoSession;
-import org.lastbamboo.common.amazon.ec2.AmazonEc2CandidateProvider;
 import org.lastbamboo.common.amazon.ec2.AmazonEc2Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages endpoint bindings for TURN clients.  This includes allocating
@@ -21,8 +21,8 @@ public final class TurnClientManagerImpl implements TurnClientManager,
     /**
      * Logger for this class.
      */
-    private static final Log LOG = 
-        LogFactory.getLog(TurnClientManagerImpl.class);
+    private final Logger m_log = 
+        LoggerFactory.getLogger(TurnClientManagerImpl.class);
     
     /**
      * Map of {@link IoSession}s to TURN clients.  Each {@link IoSession}
@@ -33,6 +33,15 @@ public final class TurnClientManagerImpl implements TurnClientManager,
         new ConcurrentHashMap<IoSession, TurnClient>();
 
     private final InetAddress m_publicAddress;
+
+    /**
+     * The maximum number of TURN clients we've seen.
+     */
+    private int m_maxSize = 0;
+
+    private int m_maxRemotePerClient = 0;
+
+    private int m_maxRemoteClients;
     
     /**
      * Creates a new TURN client manager.
@@ -43,7 +52,6 @@ public final class TurnClientManagerImpl implements TurnClientManager,
         // to give this to clients when allocating relays.
         m_publicAddress = AmazonEc2Utils.getPublicAddress();
         }
-    
 
     public TurnClient allocateBinding(final IoSession ioSession) 
         {
@@ -53,19 +61,22 @@ public final class TurnClientManagerImpl implements TurnClientManager,
         // client.
         if (this.m_clientMappings.containsKey(ioSession))
             {
+            m_log.debug("Keep alive -- we already have the binding");
             return this.m_clientMappings.get(ioSession);
             }
         
         // Otherwise, we need to allocate a new server for the new client.
         else
             {
-            // Allocate an ephemeral port.
-            //final InetSocketAddress relayAddress = 
-              //  new InetSocketAddress(m_publicAddress, 0);
             final TurnClient turnClient = 
                 new TurnClientImpl(m_publicAddress, ioSession);
             turnClient.startServer();
             this.m_clientMappings.put(ioSession, turnClient);
+            
+            if (this.m_clientMappings.size() > m_maxSize)
+                {
+                m_maxSize = this.m_clientMappings.size();
+                }
             return turnClient;
             }
         }
@@ -77,9 +88,9 @@ public final class TurnClientManagerImpl implements TurnClientManager,
 
     public TurnClient removeBinding(final IoSession session)
         {
-        if (LOG.isDebugEnabled())
+        if (m_log.isDebugEnabled())
             {
-            LOG.debug("Removing binding for: "+session);
+            m_log.debug("Removing binding for: "+session);
             }
         final TurnClient client = this.m_clientMappings.remove(session);
         if (client != null)
@@ -89,9 +100,55 @@ public final class TurnClientManagerImpl implements TurnClientManager,
         return client;
         }
 
-
     public int getNumClients()
         {
         return this.m_clientMappings.size();
+        }
+
+    public int getMaxClients()
+        {
+        return this.m_maxSize;
+        }
+    
+    public int getRemoteClients()
+        {
+        int numRemoteClients = 0;
+        
+        // We unfortunately have to synchronize on the iteration here, but
+        // it should be really quick.
+        synchronized (this.m_clientMappings)
+            {
+            final Collection<TurnClient> clients = 
+                this.m_clientMappings.values();
+            for (final TurnClient client : clients)
+                {
+                final int numRemote = client.getNumConnections();
+                
+                // Record the maximum number of remote host connections per 
+                // client.
+                if (numRemote > m_maxRemotePerClient)
+                    {
+                    m_maxRemotePerClient = numRemote;
+                    }
+                numRemoteClients += numRemote;
+                }
+            }
+        
+        // Record the maximum total remote connections.
+        if (numRemoteClients > m_maxRemoteClients)
+            {
+            m_maxRemoteClients = numRemoteClients;
+            }
+        return numRemoteClients;
+        }
+
+    public int getMaxRemoteClients()
+        {
+        return this.m_maxRemoteClients;
+        }
+
+    public int getMaxRemotePerClient()
+        {
+        return this.m_maxRemotePerClient;
         }
     }
