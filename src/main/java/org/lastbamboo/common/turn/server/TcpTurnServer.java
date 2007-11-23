@@ -72,6 +72,7 @@ public class TcpTurnServer implements TurnServer, IoServiceListener
     
     public void stop()
         {
+        m_log.debug("Stopping server...");
         this.m_minaServer.stop();
         }
 
@@ -79,14 +80,14 @@ public class TcpTurnServer implements TurnServer, IoServiceListener
         final SocketAddress serviceAddress, final IoHandler handler, 
         final IoServiceConfig config)
         {
-        m_log.debug("Started server on: "+serviceAddress);
+        m_log.debug("Started server on: {}", serviceAddress);
         }
 
     public void serviceDeactivated(final IoService service, 
         final SocketAddress serviceAddress, final IoHandler handler, 
         final IoServiceConfig config)
         {
-        m_log.warn("TURN Server deactivated!!");
+        m_log.warn("TURN Server deactivated on: {}", serviceAddress);
         }
 
     public void sessionCreated(final IoSession session)

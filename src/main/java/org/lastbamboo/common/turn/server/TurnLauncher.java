@@ -40,7 +40,10 @@ public class TurnLauncher
 
     private TurnClientManager m_turnClientManager;
 
-    private TurnLauncher()
+    /**
+     * Creates a new TURN launcher.
+     */
+    public TurnLauncher()
         {
         loadContexts();
         }
@@ -65,12 +68,9 @@ public class TurnLauncher
 
     /**
      * Launches any services that should be launched only if this peer is on
-     * the open internet, such as running a TURN server or a SIP proxy.
-     *
-     * @param publicAddress The public address of this host on the open 
-     * internet.
+     * the open Internet, such as running a TURN server or a SIP proxy.
      */
-    private void start()
+    public void start()
         {
         // Launch the TURN server
         m_turnServer.start ();
@@ -113,5 +113,13 @@ public class TurnLauncher
             {
             LOG.error("Could not start JMX", e);
             }
+        }
+
+    /**
+     * Stops the server.
+     */
+    public void stop()
+        {
+        this.m_turnServer.stop();
         }
     }
