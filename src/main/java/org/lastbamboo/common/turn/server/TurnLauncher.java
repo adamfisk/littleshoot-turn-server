@@ -1,14 +1,5 @@
 package org.lastbamboo.common.turn.server;
 
-import java.lang.management.ManagementFactory;
-
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
-import javax.management.ObjectName;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -38,8 +29,6 @@ public class TurnLauncher
 
     private TurnServer m_turnServer;
 
-    private TurnClientManager m_turnClientManager;
-
     /**
      * Creates a new TURN launcher.
      */
@@ -59,10 +48,7 @@ public class TurnLauncher
         final ClassPathXmlApplicationContext context = 
             new ClassPathXmlApplicationContext(contexts);
         LOG.debug("Loaded contexts...");
-        
         this.m_turnServer = (TurnServer) context.getBean("turnServer");
-        this.m_turnClientManager = 
-            (TurnClientManager)context.getBean("turnClientManager");
         LOG.debug("Loaded context...");
         }
 
@@ -74,46 +60,8 @@ public class TurnLauncher
         {
         // Launch the TURN server
         m_turnServer.start ();
-        
-        // Start this last because otherwise we might be seen as "online"
-        // prematurely.
-        startJmxServer();
         }
     
-
-    private void startJmxServer()
-        {
-        LOG.debug("Starting JMX server...");
-        final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        final ObjectName mbeanName;
-        try
-            {
-            final String jmxUrl = 
-                "org.lastbamboo.common.turn.server:type=TurnClientManagerImpl";
-            mbeanName = new ObjectName(jmxUrl);
-            }
-        catch (final MalformedObjectNameException e)
-            {
-            LOG.error("Could not start JMX", e);
-            return;
-            }
-        try
-            {
-            mbs.registerMBean(this.m_turnClientManager, mbeanName);
-            }
-        catch (final InstanceAlreadyExistsException e)
-            {
-            LOG.error("Could not start JMX", e);
-            }
-        catch (final MBeanRegistrationException e)
-            {
-            LOG.error("Could not start JMX", e);
-            }
-        catch (final NotCompliantMBeanException e)
-            {
-            LOG.error("Could not start JMX", e);
-            }
-        }
 
     /**
      * Stops the server.

@@ -1,6 +1,14 @@
 package org.lastbamboo.common.turn.server;
 
+import java.lang.management.ManagementFactory;
 import java.net.SocketAddress;
+
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoHandler;
@@ -68,6 +76,7 @@ public class TcpTurnServer implements TurnServer, IoServiceListener
     public void start()
         {
         this.m_minaServer.start(STUN_PORT);
+        startJmxServer();
         }
     
     public void stop()
@@ -100,6 +109,40 @@ public class TcpTurnServer implements TurnServer, IoServiceListener
         // TURN client has closed.
         m_log.debug("TURN client disconnected: "+session);
         this.m_turnClientManager.removeBinding(session);
+        }
+    
+    private void startJmxServer()
+        {
+        m_log.debug("Starting JMX server...");
+        final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        final ObjectName mbeanName;
+        try
+            {
+            final String jmxUrl = 
+                "org.lastbamboo.common.turn.server:type=TurnClientManagerImpl";
+            mbeanName = new ObjectName(jmxUrl);
+            }
+        catch (final MalformedObjectNameException e)
+            {
+            m_log.error("Could not start JMX", e);
+            return;
+            }
+        try
+            {
+            mbs.registerMBean(this.m_turnClientManager, mbeanName);
+            }
+        catch (final InstanceAlreadyExistsException e)
+            {
+            m_log.error("Could not start JMX", e);
+            }
+        catch (final MBeanRegistrationException e)
+            {
+            m_log.error("Could not start JMX", e);
+            }
+        catch (final NotCompliantMBeanException e)
+            {
+            m_log.error("Could not start JMX", e);
+            }
         }
 
     }
