@@ -56,7 +56,6 @@
                     <bundleName>LittleShoot</bundleName>
                     <javaArgs>
                         <param>-server</param>
-                        <param>-Xms40m</param>
 			<param>-Xmx600m</param>
                         </javaArgs>
                     <mainClass>
