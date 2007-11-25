@@ -51,4 +51,5 @@ public interface TurnClientManagerImplMBean
      * any single client. 
      */
     int getMaxRemotePerClient();
+
     }

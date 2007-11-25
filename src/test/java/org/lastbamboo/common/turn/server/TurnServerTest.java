@@ -50,6 +50,7 @@ public final class TurnServerTest extends TestCase
             return;
             }
         
+        
         m_server = new TcpTurnServer();
         m_server.start();
         Thread.sleep(1000);

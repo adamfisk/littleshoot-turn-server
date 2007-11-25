@@ -42,7 +42,7 @@ public final class TurnClientManagerImpl implements TurnClientManager,
     private int m_maxRemotePerClient = 0;
 
     private int m_maxRemoteClients;
-    
+
     /**
      * Creates a new TURN client manager.
      */

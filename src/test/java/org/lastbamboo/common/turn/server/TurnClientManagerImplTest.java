@@ -22,13 +22,14 @@ public final class TurnClientManagerImplTest extends TestCase
     private final Logger m_log = LoggerFactory.getLogger(getClass());
     
     /**
-     * Tests the class for removing bindings to TURN cleints.
+     * Tests the class for removing bindings to TURN clients.
      *
      * @throws Exception If any unexpected error occurs.
      */
     public void testRemoveBinding() throws Exception
         {
-        final TurnClientManagerImpl clientManager = new TurnClientManagerImpl();
+        final TurnClientManagerImpl clientManager = 
+            new TurnClientManagerImpl();
         
         final InetSocketAddress host =
             new InetSocketAddress("1.1.1.1", 5332);
