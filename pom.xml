@@ -60,7 +60,7 @@
                     <javaSystemProps>
                         <property>
                             <name>com.sun.management.jmxremote.port</name>
-                            <value>8191</value>
+                            <value>8190</value>
                             </property>
                         <property>
                             <name>com.sun.management.jmxremote.authenticate</name>
