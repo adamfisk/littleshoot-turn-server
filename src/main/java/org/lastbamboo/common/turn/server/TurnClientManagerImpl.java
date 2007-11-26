@@ -100,17 +100,17 @@ public final class TurnClientManagerImpl implements TurnClientManager,
         return client;
         }
 
-    public int getNumClients()
+    public int getNumTurnClients()
         {
         return this.m_clientMappings.size();
         }
 
-    public int getMaxClients()
+    public int getMaxNumTurnClients()
         {
         return this.m_maxSize;
         }
     
-    public int getRemoteClients()
+    public int getNumRemoteTurnClients()
         {
         int numRemoteClients = 0;
         
@@ -142,12 +142,12 @@ public final class TurnClientManagerImpl implements TurnClientManager,
         return numRemoteClients;
         }
 
-    public int getMaxRemoteClients()
+    public int getMaxNumRemoteTurnClients()
         {
         return this.m_maxRemoteClients;
         }
 
-    public int getMaxRemotePerClient()
+    public int getMaxNumRemoteSingleTurnClient()
         {
         return this.m_maxRemotePerClient;
         }
