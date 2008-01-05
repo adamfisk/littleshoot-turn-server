@@ -50,12 +50,11 @@ public final class TurnServerTest extends TestCase
             return;
             }
         
-        
         m_server = new TcpTurnServer();
         m_server.start();
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         m_turnClientSocket = new Socket(NetworkUtils.getLocalHost(), 3478);
-        m_turnClientSocket.setSoTimeout(1000);
+        m_turnClientSocket.setSoTimeout(3000);
         }
     
     protected void tearDown() throws Exception
@@ -93,7 +92,7 @@ public final class TurnServerTest extends TestCase
         // Now make sure we're rejected from connecting to that address since we
         // have not sent a Connect Request to it yet...
         LOG.trace("About to start socket for remote client");
-        Socket remoteHostSocket = new Socket();
+        final Socket remoteHostSocket = new Socket();
         //remoteHostSocket.connect(allocatedSocketAddress);
         //remoteHostSocket.setSoTimeout(6000);
         
@@ -135,15 +134,17 @@ public final class TurnServerTest extends TestCase
         // bind failures if the test is run in rapid succession.  This makes
         // that extremely unlikely.
         final int port = 1024 + (RandomUtils.nextInt() % 5000);
-        remoteHostSocket.bind(new InetSocketAddress("127.0.0.1", port));
+        remoteHostSocket.bind(
+            new InetSocketAddress(NetworkUtils.getLocalHost(), port));
 
         final InetSocketAddress remoteHostAddress = 
             (InetSocketAddress) remoteHostSocket.getLocalSocketAddress();
         LOG.debug("Bound to: "+remoteHostAddress);
         
+        assertTrue(relaySocketAddress.getAddress().isReachable(4000));
         try
             {
-            remoteHostSocket.connect(relaySocketAddress, 3000);
+            remoteHostSocket.connect(relaySocketAddress, 6000);
             }
         catch (final IOException e) 
             {
