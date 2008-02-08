@@ -9,7 +9,9 @@ import junit.framework.TestCase;
 
 import org.apache.mina.common.ByteBuffer;
 import org.apache.mina.common.IoSession;
+import org.lastbamboo.common.amazon.ec2.AmazonEc2Utils;
 import org.lastbamboo.common.turn.stub.IoSessionStub;
+import org.lastbamboo.common.util.NetworkUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,9 +94,23 @@ public final class TurnClientManagerImplTest extends TestCase
         throws SocketException
         {
         client.setSoTimeout(3000);
+
         try
             {
-            client.connect(allocatedSocketAddress, 3000);
+            final InetSocketAddress toUse;
+            
+            // We unfortunately have to do this because EC2 doesn't support hairpinning, 
+            // so we can't connect to the real public address.
+            if (AmazonEc2Utils.onEc2())
+                {
+                toUse = new InetSocketAddress(NetworkUtils.getLocalHost(), 
+                        allocatedSocketAddress.getPort());
+                }
+            else
+                {
+                toUse = allocatedSocketAddress;
+                }
+            client.connect(toUse, 3000);
             assertTrue(client.isBound());
             assertTrue(client.isConnected());
             }
