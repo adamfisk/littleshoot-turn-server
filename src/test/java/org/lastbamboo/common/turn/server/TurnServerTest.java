@@ -14,6 +14,7 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.mina.common.ByteBuffer;
+import org.lastbamboo.common.amazon.ec2.AmazonEc2Utils;
 import org.lastbamboo.common.stun.stack.encoder.StunMessageEncoder;
 import org.lastbamboo.common.stun.stack.message.StunMessage;
 import org.lastbamboo.common.stun.stack.message.StunMessageType;
@@ -83,8 +84,20 @@ public final class TurnServerTest extends TestCase
         // Vista seems to have an issue with connecting to local network 
         // addresses, so we use straight localhost instead and just use the 
         // allocated port.
-        final InetSocketAddress relaySocketAddress = 
-            ma.getInetSocketAddress();
+        
+        // We also need to do the workaround below because EC2 doesn't support
+        // hairpinning.
+        final InetSocketAddress relaySocketAddress;
+        if (AmazonEc2Utils.onEc2())
+            {
+            relaySocketAddress =
+                new InetSocketAddress(NetworkUtils.getLocalHost(), 
+                    ma.getInetSocketAddress().getPort());
+            }
+        else
+            {
+            relaySocketAddress = ma.getInetSocketAddress();
+            }
         // Done reading the allocate response.  We'll use this to connect to
         // the TURN client.
         
@@ -93,41 +106,8 @@ public final class TurnServerTest extends TestCase
         // have not sent a Connect Request to it yet...
         LOG.trace("About to start socket for remote client");
         final Socket remoteHostSocket = new Socket();
-        //remoteHostSocket.connect(allocatedSocketAddress);
-        //remoteHostSocket.setSoTimeout(6000);
         
         LOG.trace("Started socket....");
-        //final InputStream readStream = remoteHostSocket.getInputStream();
-
-        // Make sure the stream is dead.
-        //assertEquals(-1, readStream.read());
-        //remoteHostSocket.close();
-        
-        // Now send a connect request for that client.  This will just open
-        // permissions for the remote host.
-        //final InetSocketAddress remoteHostAddress = 
-          //  new InetSocketAddress("127.0.0.1", 52811);
-        //final ConnectRequest connectRequest = 
-          //  new ConnectRequest(remoteHostAddress);
-        //write(m_turnClientSocket, connectRequest);
-        //LOG.debug("Wrote connect request");
-        
-        // The server will generate a connection status indication in response
-        // to the connect request.  Process it!
-        /*
-        LOG.debug("Processing connection status...");
-        Map<Integer, StunAttribute> messageAttributes = 
-            readMessage(m_turnClientSocket, 
-                StunMessageType.CONNECTION_STATUS_INDICATION,
-                StunAttributeType.CONNECT_STAT, 4);
-        LOG.debug("Processed connection status");
-        */
-        
-        // Now the remote host should have permission to connect, so connect it.
-        //remoteHostSocket = new Socket();
-        // We just store this for future use.  It's the address of the "remote"
-        // host.
-        //remoteHostSocket.bind(remoteHostAddress);
         
         // We create a random port here because the operating system keeps 
         // ports bound for a bit even after the socket is closed, leading to
@@ -140,11 +120,11 @@ public final class TurnServerTest extends TestCase
         final InetSocketAddress remoteHostAddress = 
             (InetSocketAddress) remoteHostSocket.getLocalSocketAddress();
         LOG.debug("Bound to: "+remoteHostAddress);
-        
-        assertTrue("Could not reach address", 
+
+        LOG.debug("Connecting to: "+relaySocketAddress.getAddress());
+        assertTrue("Could not reach address: "+relaySocketAddress.getAddress(), 
                 relaySocketAddress.getAddress().isReachable(4000));
         
-        LOG.debug("Connecting to: "+relaySocketAddress);
         try
             {
             remoteHostSocket.connect(relaySocketAddress, 6000);
