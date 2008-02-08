@@ -141,7 +141,10 @@ public final class TurnServerTest extends TestCase
             (InetSocketAddress) remoteHostSocket.getLocalSocketAddress();
         LOG.debug("Bound to: "+remoteHostAddress);
         
-        assertTrue(relaySocketAddress.getAddress().isReachable(4000));
+        assertTrue("Could not reach address", 
+                relaySocketAddress.getAddress().isReachable(4000));
+        
+        LOG.debug("Connecting to: "+relaySocketAddress);
         try
             {
             remoteHostSocket.connect(relaySocketAddress, 6000);
@@ -152,8 +155,8 @@ public final class TurnServerTest extends TestCase
             fail("could not connect to: "+relaySocketAddress+" "+ 
                 e.getMessage());
             }
-        assertTrue(remoteHostSocket.isConnected());
-        assertTrue(remoteHostSocket.isBound());
+        assertTrue("Socket not connected", remoteHostSocket.isConnected());
+        assertTrue("Socket not bound", remoteHostSocket.isBound());
         LOG.debug("Remote host connected successfully!");
         
         // The server again sends a connect status because the client is now
