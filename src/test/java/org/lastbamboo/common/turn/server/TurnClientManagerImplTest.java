@@ -94,7 +94,7 @@ public final class TurnClientManagerImplTest extends TestCase
         client.setSoTimeout(3000);
         try
             {
-            client.connect(allocatedSocketAddress);
+            client.connect(allocatedSocketAddress, 3000);
             assertTrue(client.isBound());
             assertTrue(client.isConnected());
             }
