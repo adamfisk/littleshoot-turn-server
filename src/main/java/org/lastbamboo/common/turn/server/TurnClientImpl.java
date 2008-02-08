@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  *
  * Note that this class does not implement <code>CloseListener</code> because
  * doing so would require us to keep track of a separate data structure of
- * "cancelled" connections.  Instead, we simply allow the write attempt to
+ * "canceled" connections.  Instead, we simply allow the write attempt to
  * throw an <code>IOException</code>, allowing the caller to respond with
  * "Send Error Response" messages to the TURN client as appropriate.<p>
  *
@@ -242,6 +242,7 @@ public final class TurnClientImpl implements TurnClient
     private void updateConnectionStatus(final InetSocketAddress remoteAddress, 
         final ConnectionStatus status)
         {
+        LOG.debug("Writing connection status indication...");
         final ConnectionStatusIndication indication = 
             new ConnectionStatusIndication(remoteAddress, status);
         this.m_ioSession.write(indication);

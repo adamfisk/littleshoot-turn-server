@@ -61,14 +61,21 @@ public final class TurnClientManagerImplTest extends TestCase
         // For it to bind to an ephemeral local port.  Make sure we're able
         // to connect.
         socket.bind(null);
+        
+        assertTrue(socket.isBound());
         client.handleConnect((InetSocketAddress)socket.getLocalSocketAddress());
+        
+        final InetSocketAddress relayAddress = client.getRelayAddress();
+        m_log.debug("Connecting to relay address: {}", relayAddress);
+        
         
         // Make sure we can connect to the allocated address for the TURN
         // client.
-        connectToServerSuccess(client.getRelayAddress(), socket);
+        connectToServerSuccess(relayAddress, socket);
 
         final TurnClient removedClient = clientManager.removeBinding(session);
 
+        m_log.debug("About to sleep...");
         Thread.sleep(800);
         assertNull(clientManager.getTurnClient(session));
 
