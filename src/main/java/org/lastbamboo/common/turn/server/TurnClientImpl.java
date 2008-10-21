@@ -65,6 +65,7 @@ public final class TurnClientImpl implements TurnClient
      * unfortunately no LRUSet.  We limit the size instead of worrying about
      * the TURN LIFETIME attribute for now.
      */
+    // TODO: Change this to LinkedHashMap???
     private final Map<InetAddress, InetAddress> m_permittedAddresses =
         Collections.synchronizedMap(new LRUMap(100));
     

@@ -119,8 +119,7 @@ public class TcpAllocatedTurnServer implements AllocatedTurnServer,
         final SocketAddress serviceAddress, final IoHandler handler, 
         final IoServiceConfig config)
         {
-        // TODO Auto-generated method stub
-        
+        LOG.debug("Deactivating allocated TURN server...");
         }
 
     public void sessionCreated(final IoSession session)
