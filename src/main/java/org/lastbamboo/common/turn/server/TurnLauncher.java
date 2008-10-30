@@ -1,5 +1,7 @@
 package org.lastbamboo.common.turn.server;
 
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -23,8 +25,15 @@ public class TurnLauncher
         LOG.debug("Launching SIP and TURN servers...");
         final TurnLauncher launcher = new TurnLauncher();
         LOG.debug("Created launcher");
-        launcher.start();
-        LOG.debug("Started launcher");
+        try
+            {
+            launcher.start();
+            LOG.debug("Started launcher");
+            }
+        catch (final Throwable t)
+            {
+            LOG.error("Could not start!!!", t);
+            }
         }
 
     private TurnServer m_turnServer;
@@ -55,8 +64,9 @@ public class TurnLauncher
     /**
      * Launches any services that should be launched only if this peer is on
      * the open Internet, such as running a TURN server or a SIP proxy.
+     * @throws IOException If we could not bind to the server socket.
      */
-    public void start()
+    public void start() throws IOException
         {
         // Launch the TURN server
         m_turnServer.start ();

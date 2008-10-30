@@ -1,5 +1,6 @@
 package org.lastbamboo.common.turn.server;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.SocketAddress;
 
@@ -66,10 +67,10 @@ public class TcpTurnServer implements TurnServer, IoServiceListener,
                 "TCP-TURN-Server");
         }
     
-    public void start()
+    public void start() throws IOException
         {
         this.m_minaServer.start(StunConstants.STUN_PORT);
-        startJmxServer();
+        //startJmxServer();
         }
     
     public void stop()
