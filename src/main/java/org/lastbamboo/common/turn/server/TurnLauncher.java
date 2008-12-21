@@ -70,6 +70,19 @@ public class TurnLauncher
         {
         // Launch the TURN server
         m_turnServer.start ();
+        
+        // Just keep the thread open.
+        try
+            {
+            synchronized (this)
+                {
+                wait();
+                }
+            }
+        catch (final InterruptedException e)
+            {
+            LOG.debug("Got interrupt -- CTR-Ced?", e);
+            }
         }
     
 
