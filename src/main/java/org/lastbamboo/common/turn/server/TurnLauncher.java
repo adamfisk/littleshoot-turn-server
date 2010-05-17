@@ -43,22 +43,7 @@ public class TurnLauncher
      */
     public TurnLauncher()
         {
-        loadContexts();
-        }
-    
-    private void loadContexts()
-        {
-        final String[] contexts = 
-            {
-            "turnServerBeans.xml", 
-            "amazonEc2Beans.xml"
-            };
-        LOG.debug("Loading contexts...");
-        final ClassPathXmlApplicationContext context = 
-            new ClassPathXmlApplicationContext(contexts);
-        LOG.debug("Loaded contexts...");
-        this.m_turnServer = (TurnServer) context.getBean("turnServer");
-        LOG.debug("Loaded context...");
+        this.m_turnServer = new TcpTurnServer(new TurnClientManagerImpl());
         }
 
     /**
