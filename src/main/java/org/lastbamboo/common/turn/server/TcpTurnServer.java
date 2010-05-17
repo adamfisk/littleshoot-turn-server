@@ -6,14 +6,14 @@ import java.net.SocketAddress;
 
 import javax.management.MBeanServer;
 
-import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoServiceConfig;
-import org.apache.mina.common.IoServiceListener;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.SimpleByteBufferAllocator;
-import org.apache.mina.filter.codec.ProtocolCodecFactory;
+import org.littleshoot.mina.common.ByteBuffer;
+import org.littleshoot.mina.common.IoHandler;
+import org.littleshoot.mina.common.IoService;
+import org.littleshoot.mina.common.IoServiceConfig;
+import org.littleshoot.mina.common.IoServiceListener;
+import org.littleshoot.mina.common.IoSession;
+import org.littleshoot.mina.common.SimpleByteBufferAllocator;
+import org.littleshoot.mina.filter.codec.ProtocolCodecFactory;
 import org.lastbamboo.common.stun.stack.StunConstants;
 import org.lastbamboo.common.stun.stack.StunProtocolCodecFactory;
 import org.lastbamboo.common.stun.stack.message.StunMessageVisitorFactory;

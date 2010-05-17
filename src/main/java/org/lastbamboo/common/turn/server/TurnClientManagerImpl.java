@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.mina.common.IoSession;
+import org.littleshoot.mina.common.IoSession;
 import org.lastbamboo.common.amazon.ec2.AmazonEc2Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

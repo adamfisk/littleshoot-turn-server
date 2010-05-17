@@ -2,8 +2,8 @@ package org.lastbamboo.common.turn.server;
 
 import java.net.InetSocketAddress;
 
-import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.IoSession;
+import org.littleshoot.mina.common.ByteBuffer;
+import org.littleshoot.mina.common.IoSession;
 
 /**
  * Interface for classes that keep track of data for TURN clients that this

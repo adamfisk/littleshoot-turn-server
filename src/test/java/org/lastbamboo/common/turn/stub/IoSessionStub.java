@@ -5,17 +5,17 @@ import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.Set;
 
-import org.apache.mina.common.CloseFuture;
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoFilterChain;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoService;
-import org.apache.mina.common.IoServiceConfig;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.IoSessionConfig;
-import org.apache.mina.common.TrafficMask;
-import org.apache.mina.common.TransportType;
-import org.apache.mina.common.WriteFuture;
+import org.littleshoot.mina.common.CloseFuture;
+import org.littleshoot.mina.common.IdleStatus;
+import org.littleshoot.mina.common.IoFilterChain;
+import org.littleshoot.mina.common.IoHandler;
+import org.littleshoot.mina.common.IoService;
+import org.littleshoot.mina.common.IoServiceConfig;
+import org.littleshoot.mina.common.IoSession;
+import org.littleshoot.mina.common.IoSessionConfig;
+import org.littleshoot.mina.common.TrafficMask;
+import org.littleshoot.mina.common.TransportType;
+import org.littleshoot.mina.common.WriteFuture;
 import org.lastbamboo.common.util.NetworkUtils;
 
 public class IoSessionStub implements IoSession

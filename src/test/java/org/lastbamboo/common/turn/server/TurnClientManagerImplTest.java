@@ -7,8 +7,8 @@ import java.net.SocketException;
 
 import junit.framework.TestCase;
 
-import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.IoSession;
+import org.littleshoot.mina.common.ByteBuffer;
+import org.littleshoot.mina.common.IoSession;
 import org.lastbamboo.common.amazon.ec2.AmazonEc2Utils;
 import org.lastbamboo.common.turn.stub.IoSessionStub;
 import org.lastbamboo.common.util.NetworkUtils;

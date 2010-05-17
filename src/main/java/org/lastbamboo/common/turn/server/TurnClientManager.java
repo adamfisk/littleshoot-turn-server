@@ -1,6 +1,6 @@
 package org.lastbamboo.common.turn.server;
 
-import org.apache.mina.common.IoSession;
+import org.littleshoot.mina.common.IoSession;
 
 /**
  * Interface for classes that manage allocated binding for TURN clients.  These

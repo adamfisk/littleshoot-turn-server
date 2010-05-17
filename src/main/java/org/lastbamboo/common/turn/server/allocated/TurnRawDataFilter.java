@@ -3,9 +3,9 @@ package org.lastbamboo.common.turn.server.allocated;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 
-import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.IoFilterAdapter;
-import org.apache.mina.common.IoSession;
+import org.littleshoot.mina.common.ByteBuffer;
+import org.littleshoot.mina.common.IoFilterAdapter;
+import org.littleshoot.mina.common.IoSession;
 import org.lastbamboo.common.stun.stack.message.turn.DataIndication;
 import org.lastbamboo.common.util.mina.MinaUtils;
 import org.slf4j.Logger;
