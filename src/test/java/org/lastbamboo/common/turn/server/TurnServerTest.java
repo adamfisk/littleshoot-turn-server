@@ -11,8 +11,8 @@ import java.util.Scanner;
 import junit.framework.TestCase;
 
 import org.apache.commons.lang.math.RandomUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.littleshoot.mina.common.ByteBuffer;
 import org.lastbamboo.common.amazon.ec2.AmazonEc2Utils;
 import org.lastbamboo.common.stun.stack.encoder.StunMessageEncoder;
@@ -38,7 +38,7 @@ public final class TurnServerTest extends TestCase
     /**
      * Logger for this class.
      */
-    private static final Log LOG = LogFactory.getLog(TurnServerTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TurnServerTest.class);
 
     private Socket m_turnClientSocket;
 
