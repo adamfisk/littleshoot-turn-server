@@ -57,7 +57,7 @@ public class TurnServerIoHandler extends StunIoHandler
         // handlers to clean up all mappings and references. We close idle
         // sessions because properly implemented clients should be sending
         // keep alive messages.
-        m_log.debug("Closing idle TURN session");
-        session.close();
+        m_log.debug("Got idle TURN session");
+        //session.close();
         }
     }

@@ -64,6 +64,7 @@ public class AllocatedTurnServerIoHandler extends IoHandlerAdapter
     public void sessionIdle(final IoSession session, final IdleStatus status)
         {
         // Kill idle sessions.
-        session.close();
+        m_log.debug("Got idle TURN session");
+        //session.close();
         }
     }
