@@ -47,7 +47,7 @@ public class TurnServerIoHandler extends StunIoHandler
         // periodically updating the connection with allocate requests, but
         // those might not come for awhile if there's a large file transfer,
         // for example, so we respect traffic from either direction.
-        session.setIdleTime(IdleStatus.BOTH_IDLE, 60 * 10);
+        //session.setIdleTime(IdleStatus.BOTH_IDLE, 60 * 10);
         }
 
     @Override

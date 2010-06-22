@@ -57,7 +57,7 @@ public class AllocatedTurnServerIoHandler extends IoHandlerAdapter
         // The idle time is in seconds.  If there's been no traffic in either
         // direction for awhile, we free the connection to limit load on the
         // server.
-        session.setIdleTime(IdleStatus.BOTH_IDLE, 300);
+        //session.setIdleTime(IdleStatus.BOTH_IDLE, 300);
         }
 
     @Override
