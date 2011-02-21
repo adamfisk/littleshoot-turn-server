@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 import org.littleshoot.mina.common.ByteBuffer;
 import org.littleshoot.mina.common.IoSession;
 import org.lastbamboo.common.turn.stub.IoSessionStub;
-import org.lastbamboo.common.util.NetworkUtils;
+import org.littleshoot.util.NetworkUtils;
 
 /**
  * Tests the class that handles services for a single TURN client.

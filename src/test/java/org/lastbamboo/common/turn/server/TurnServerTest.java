@@ -26,8 +26,8 @@ import org.lastbamboo.common.stun.stack.message.attributes.turn.DataAttribute;
 import org.lastbamboo.common.stun.stack.message.attributes.turn.RelayAddressAttribute;
 import org.lastbamboo.common.stun.stack.message.turn.AllocateRequest;
 import org.lastbamboo.common.stun.stack.message.turn.SendIndication;
-import org.lastbamboo.common.util.NetworkUtils;
-import org.lastbamboo.common.util.mina.MinaUtils;
+import org.littleshoot.util.NetworkUtils;
+import org.littleshoot.util.mina.MinaUtils;
 
 /**
  * Tests the TURN servers response to all TURN requests.

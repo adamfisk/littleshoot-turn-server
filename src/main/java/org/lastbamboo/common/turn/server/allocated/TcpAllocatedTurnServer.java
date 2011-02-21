@@ -20,8 +20,8 @@ import org.littleshoot.mina.filter.executor.ExecutorFilter;
 import org.littleshoot.mina.transport.socket.nio.SocketAcceptor;
 import org.littleshoot.mina.transport.socket.nio.SocketAcceptorConfig;
 import org.lastbamboo.common.turn.server.TurnClient;
-import org.lastbamboo.common.util.DaemonThreadFactory;
-import org.lastbamboo.common.util.NetworkUtils;
+import org.littleshoot.util.DaemonThreadFactory;
+import org.littleshoot.util.NetworkUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

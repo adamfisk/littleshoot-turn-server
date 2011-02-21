@@ -17,8 +17,8 @@ import org.littleshoot.mina.filter.codec.ProtocolCodecFactory;
 import org.lastbamboo.common.stun.stack.StunConstants;
 import org.lastbamboo.common.stun.stack.StunProtocolCodecFactory;
 import org.lastbamboo.common.stun.stack.message.StunMessageVisitorFactory;
-import org.lastbamboo.common.util.JmxUtils;
-import org.lastbamboo.common.util.mina.MinaTcpServer;
+import org.littleshoot.util.JmxUtils;
+import org.littleshoot.util.mina.MinaTcpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

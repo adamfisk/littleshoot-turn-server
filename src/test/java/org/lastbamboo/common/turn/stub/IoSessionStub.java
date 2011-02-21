@@ -16,7 +16,7 @@ import org.littleshoot.mina.common.IoSessionConfig;
 import org.littleshoot.mina.common.TrafficMask;
 import org.littleshoot.mina.common.TransportType;
 import org.littleshoot.mina.common.WriteFuture;
-import org.lastbamboo.common.util.NetworkUtils;
+import org.littleshoot.util.NetworkUtils;
 
 public class IoSessionStub implements IoSession
     {

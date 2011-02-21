@@ -11,7 +11,7 @@ import org.littleshoot.mina.common.ByteBuffer;
 import org.littleshoot.mina.common.IoSession;
 import org.lastbamboo.common.amazon.ec2.AmazonEc2Utils;
 import org.lastbamboo.common.turn.stub.IoSessionStub;
-import org.lastbamboo.common.util.NetworkUtils;
+import org.littleshoot.util.NetworkUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
