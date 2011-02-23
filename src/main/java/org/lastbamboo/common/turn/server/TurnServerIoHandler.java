@@ -4,8 +4,8 @@ import org.littleshoot.mina.common.IdleStatus;
 import org.littleshoot.mina.common.IoHandler;
 import org.littleshoot.mina.common.IoSession;
 import org.littleshoot.mina.util.SessionUtil;
-import org.lastbamboo.common.stun.stack.StunIoHandler;
-import org.lastbamboo.common.stun.stack.message.StunMessageVisitorFactory;
+import org.littleshoot.stun.stack.StunIoHandler;
+import org.littleshoot.stun.stack.message.StunMessageVisitorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

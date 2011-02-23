@@ -1,8 +1,8 @@
 package org.lastbamboo.common.turn.server;
 
 import org.littleshoot.mina.common.IoSession;
-import org.lastbamboo.common.stun.stack.message.StunMessageVisitor;
-import org.lastbamboo.common.stun.stack.message.StunMessageVisitorFactory;
+import org.littleshoot.stun.stack.message.StunMessageVisitor;
+import org.littleshoot.stun.stack.message.StunMessageVisitorFactory;
 
 /**
  * Factory fore creating message visitors for TURN servers.

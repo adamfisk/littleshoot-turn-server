@@ -4,12 +4,12 @@ import java.net.InetSocketAddress;
 
 import org.littleshoot.mina.common.ByteBuffer;
 import org.littleshoot.mina.common.IoSession;
-import org.lastbamboo.common.stun.stack.message.StunMessage;
-import org.lastbamboo.common.stun.stack.message.StunMessageVisitorAdapter;
-import org.lastbamboo.common.stun.stack.message.turn.AllocateRequest;
-import org.lastbamboo.common.stun.stack.message.turn.AllocateSuccessResponse;
-import org.lastbamboo.common.stun.stack.message.turn.ConnectRequest;
-import org.lastbamboo.common.stun.stack.message.turn.SendIndication;
+import org.littleshoot.stun.stack.message.StunMessage;
+import org.littleshoot.stun.stack.message.StunMessageVisitorAdapter;
+import org.littleshoot.stun.stack.message.turn.AllocateRequest;
+import org.littleshoot.stun.stack.message.turn.AllocateSuccessResponse;
+import org.littleshoot.stun.stack.message.turn.ConnectRequest;
+import org.littleshoot.stun.stack.message.turn.SendIndication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

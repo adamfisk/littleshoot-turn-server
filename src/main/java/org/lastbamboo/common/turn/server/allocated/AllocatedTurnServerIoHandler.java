@@ -6,7 +6,7 @@ import org.littleshoot.mina.common.IoHandler;
 import org.littleshoot.mina.common.IoHandlerAdapter;
 import org.littleshoot.mina.common.IoSession;
 import org.littleshoot.mina.util.SessionUtil;
-import org.lastbamboo.common.stun.stack.message.turn.DataIndication;
+import org.littleshoot.stun.stack.message.turn.DataIndication;
 import org.lastbamboo.common.turn.server.TurnClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
