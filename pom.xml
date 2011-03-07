@@ -26,9 +26,9 @@
     </licenses>
 
     <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>6</version>
+        <groupId>org.littleshoot</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
     </parent>
 
     <scm>
