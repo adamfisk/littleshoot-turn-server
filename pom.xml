@@ -3,7 +3,7 @@
     <groupId>org.littleshoot</groupId>
     <artifactId>turn-server</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
     <name>LittleShoot TURN Server</name>
     <url>http://www.littleshoot.org</url>
 
@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.littleshoot</groupId>
         <artifactId>parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.3</version>
     </parent>
 
     <scm>
@@ -55,21 +55,13 @@
         <dependency>
             <groupId>org.littleshoot</groupId>
             <artifactId>amazon-ec2</artifactId>
+            <version>${ls.version}</version>
         </dependency> 
-
-        <dependency>
-            <groupId>org.littleshoot</groupId>
-            <artifactId>mina-port</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.littleshoot</groupId>
             <artifactId>stun-stack</artifactId>
-        </dependency> 
-
-        <dependency>
-            <groupId>org.littleshoot</groupId>
-            <artifactId>util</artifactId>
+            <version>${ls.version}</version>
         </dependency> 
 
     </dependencies>
