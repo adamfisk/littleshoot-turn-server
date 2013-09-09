@@ -12,14 +12,6 @@
         <url>http://www.littleshoot.org</url>
     </organization>
 
-    <licenses>
-        <license>
-            <name>GNU General Public License Version 2</name> 
-            <url>http://www.gnu.org/licenses/gpl.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
     <parent>
         <groupId>org.littleshoot</groupId>
         <artifactId>parent</artifactId>
